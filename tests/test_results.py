@@ -57,17 +57,43 @@ def test_recorded_basis_operation_words_all_replay():
 
 @pytest.mark.skipif(not CLAIMS_FILE.exists(), reason="run scripts/certify.py")
 def test_claims_file_is_self_consistent():
+    """Every claim is coherent, and every shipped artifact is where it says.
+
+    Only the shortest witnesses ship their (large) CNF/DRAT pair; the rest
+    are gitignored because they regenerate deterministically from the
+    permutation.  So a missing artifact is not a failure -- but a claim that
+    contradicts itself is.
+    """
     claims = json.loads(CLAIMS_FILE.read_text())
     assert claims, "no claims recorded"
     for c in claims:
-        assert (ROOT / c["cnf"]).exists(), c["id"]
+        second = c.get("second_solver", {})
+        assert second.get("agrees") is not False, f"{c['id']}: solvers disagree"
+        bf = c.get("brute_force") or {}
+        assert bf.get("agrees") is not False, f"{c['id']}: brute force disagrees"
         if c["sortable"]:
             perm = from_string(c["perm"])
             assert verify.sorts(list(perm), verify.parse_ops(c["ops"]), k=c["k"])
         else:
-            assert (ROOT / c["drat"]).exists(), c["id"]
-            second = c.get("second_solver", {})
-            assert second.get("agrees") is not False, c["id"]
+            assert c.get("drat"), c["id"]
+            if (ROOT / c["cnf"]).exists():
+                # if the CNF ships, its header must match the recorded sizes
+                head = (ROOT / c["cnf"]).read_text().splitlines()
+                pline = next(l for l in head if l.startswith("p cnf"))
+                _, _, nv, nc = pline.split()
+                assert int(nv) == c["n_vars"] and int(nc) == c["n_clauses"], c["id"]
+
+
+@pytest.mark.skipif(not CLAIMS_FILE.exists(), reason="run scripts/certify.py")
+def test_shortest_witness_ships_its_certificate():
+    """A reader must be able to check the headline claim without a solver."""
+    claims = json.loads(CLAIMS_FILE.read_text())
+    unsat = [c for c in claims if not c["sortable"] and c["k"] == 3]
+    best = min(unsat, key=lambda c: c["n"])
+    assert (ROOT / best["cnf"]).exists(), (
+        f"{best['id']} is the headline claim but its CNF is not committed")
+    assert (ROOT / best["drat"]).exists(), (
+        f"{best['id']} is the headline claim but its DRAT is not committed")
 
 
 @pytest.mark.skipif(not CLAIMS_FILE.exists(), reason="run scripts/certify.py")
