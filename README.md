@@ -1,10 +1,10 @@
 # three-stacks
 
-**A permutation of length 24 that three stacks in series cannot sort — with a
+**A permutation of length 23 that three stacks in series cannot sort — with a
 machine-checkable proof.**
 
 ```
-6-15-2-17-9-4-19-7-13-3-18-10-24-5-20-12-23-8-16-21-11-14-22-1
+6-11-4-16-2-8-19-5-14-9-17-12-20-3-15-7-23-10-21-18-13-22-1
 ```
 
 The previous record was 38 (Atkinson, 1992), and it had stood for over thirty
@@ -12,10 +12,10 @@ years. No explicit witness had ever been published, at any length — not
 Tarjan's claimed 41, not Murphy's 39, not Atkinson's 38. This one comes with
 a DRAT certificate that anyone can check with someone else's checker.
 
-It is also a **basis element**: unsortable, but every one of its 24 one-point
+It is also a **basis element**: unsortable, but every one of its 23 one-point
 deletions *is* sortable, each with an explicit operation word you can replay
 by hand. So the shortest permutation three stacks cannot sort has length
-somewhere in **[14, 24]**.
+somewhere in **[14, 23]** — one step from Waton's guess of 22.
 
 Along the way this refutes **Murphy's conjecture** that t stacks in series
 sort everything up to length (t+1)! — which for t = 3 predicts that all

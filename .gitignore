@@ -18,5 +18,7 @@ results/witnesses.jsonl
 # claim without running a solver first.  Everything else is ignored.
 proofs/*.cnf
 proofs/*.drat
+!proofs/k3_n23_4a24b696.cnf
+!proofs/k3_n23_4a24b696.drat
 !proofs/k3_n24_3a74bbc0.cnf
 !proofs/k3_n24_3a74bbc0.drat

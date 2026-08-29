@@ -1,0 +1,21 @@
+{
+  "id": "k3_n23_4a24b696",
+  "perm": "6-11-4-16-2-8-19-5-14-9-17-12-20-3-15-7-23-10-21-18-13-22-1",
+  "n": 23,
+  "k": 3,
+  "encoding": "full",
+  "n_vars": 4186,
+  "n_clauses": 252791,
+  "cnf": "proofs/k3_n23_4a24b696.cnf",
+  "sortable": false,
+  "solver": "cadical.exe (external, file-backed proof)",
+  "solve_seconds": 13.455,
+  "drat": "proofs/k3_n23_4a24b696.drat",
+  "drat_bytes": 4947257,
+  "evidence": "DRAT certificate (check with proofcheck.py)",
+  "second_solver": {
+    "name": "glucose4 (pysat)",
+    "sortable": false,
+    "agrees": true
+  }
+}
