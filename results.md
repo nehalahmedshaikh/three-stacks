@@ -136,6 +136,43 @@ Worth stating because it holds even if every search fails. (The original plan
 guessed the k = 3 crossover would land near 100; the real value is 642,
 because B₃(n) ~ 256ⁿ and n! only overtakes that around n ≈ e·256.)
 
+## What the basis elements look like
+
+`scripts/analyse_basis.py` over the nine distinct basis elements found so far
+(lengths 24, 25, 26×2, 27, 28×2, 29×2):
+
+* **Eight of the nine end in `1`.** Under a uniform model a permutation ends
+  in 1 with probability 1/n ≈ 4%, so eight of nine is on the order of 1e-11.
+  There is a clean mechanical reason: if `1` is the *last* input element,
+  then at the moment it arrives every other value is already distributed
+  across the three stacks, and every one of them must leave *after* `1` —
+  in whatever LIFO order it happens to be frozen in. Putting `1` last
+  maximises the pressure on the machine, and the search discovered this
+  without being told.
+* **Inversion density runs below random**, 0.41–0.48 against ≈ 0.50, and the
+  *shortest* witness has the lowest density of all (0.406). Shorter basis
+  elements look less random, which suggests the short ones live in a
+  structured corner of the space.
+* **No two are related by any symmetry** — consistent with the finding that
+  none of the four symmetries preserves sortability.
+* Every length-4 pattern occurs in every basis element, so whatever
+  avoidance structure exists lives at larger patterns.
+
+### Structured families are all sortable
+
+Iterated direct and skew sums of `231`, `312`, `2413`, `3142`, and layered
+permutations with uniform layers, at every length up to 60: **all sortable**
+(`python scripts/hunt.py families`). At length 60 a *random* permutation is
+unsortable essentially always (9/9 in the sweep above), yet every structured
+family member sorts.
+
+So unsortability here is not built by stacking local obstructions — it
+requires genuine disorder. That is why the plan's first route (structured
+families) yields nothing, and why descending from long random witnesses was
+the approach that worked. Combined with the inversion-density observation
+above, the short basis elements appear to sit in a narrow band: too ordered
+and three stacks cope easily, too disordered and the witness is long.
+
 ## Negative results worth recording
 
 * **No symmetry is available.** None of reverse, complement, inverse, or
