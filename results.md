@@ -74,13 +74,15 @@ DFS), via `python scripts/count_sortable.py`.
 | 7 | 429 | 5,018 | 5,040 | 5,040 |
 | 8 | 1,430 | 39,374 | 40,320 | 40,320 |
 | 9 | 4,862 | 337,816 | 362,880 | 362,880 |
-| 10 | 16,796 | *running* | *running* | 3,628,800 |
+| 10 | 16,796 | 3,092,691 | *running* | 3,628,800 |
+| 11 | 58,786 | *not attempted* | *running* | 39,916,800 |
 
 Reality checks, all reproduced:
 
-* **1 stack** gives the Catalan numbers exactly (16,796 = C(10) at n = 10),
-  and the sortable permutations are precisely those avoiding `231` -- checked
-  permutation by permutation for n <= 7 (`tests/test_simulator.py`).
+* **1 stack** gives the Catalan numbers exactly -- 16,796 = C(10) and
+  58,786 = C(11) -- and the sortable permutations are precisely those
+  avoiding `231`, checked permutation by permutation for n <= 7
+  (`tests/test_simulator.py`).
 * **2 stacks in series** first fail at length **7**, with 22 unsortable
   permutations there. Length 7 is the known answer (Tarjan). Since all
   length-6 permutations sort, those 22 are all basis elements.
