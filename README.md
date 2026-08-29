@@ -17,9 +17,11 @@ deletions *is* sortable, each with an explicit operation word you can replay
 by hand. So the shortest permutation three stacks cannot sort has length
 somewhere in **[14, 24]**.
 
-Along the way this refutes **Murphy's conjecture** that t stacks sort
-everything up to length (t+1)! — for t = 3 that is 24, and here is a
-length-24 counterexample.
+Along the way this refutes **Murphy's conjecture** that t stacks in series
+sort everything up to length (t+1)! — which for t = 3 predicts that all
+permutations of length ≤ 24 sort, and that the answer is 25. The witness
+above is unsortable and has length exactly 24, landing precisely on the
+boundary the conjecture claims.
 
 Full numbers, provenance, and caveats: **[results.md](results.md)**.
 

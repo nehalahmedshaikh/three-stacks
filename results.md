@@ -27,7 +27,7 @@ deletions).
 | Elder's guess | 15 | Elder–Waton wager |
 | Waton's guess | 22 | Elder–Waton wager |
 | **this repo** | **≤ 24** | verified, certificate included |
-| Murphy's conjecture — (t+1)! = 24 sorts | 25 | **refuted** by the length-24 witness above |
+| Murphy's conjecture | 25 | **refuted** — see below |
 | Atkinson 1992, Lemma 5 | ≤ 38 | previous record, "has stood for over thirty years" |
 | Murphy | ≤ 39 / 43 | never presented |
 | Tarjan | ≤ 41 | never presented |
@@ -42,6 +42,18 @@ Murphy's, not Atkinson's 38. As far as we can tell the length-24 permutation
 above is the first explicit, independently checkable witness of any length.
 
 So the answer lies in **[14, 24]**.
+
+### Murphy's conjecture, precisely
+
+Vatter states it as: "Murphy [69, Conjecture 265] guesses more generally that
+t stacks in series can sort all permutations of length up to (t+1)!, which
+would give **25** as the length of the shortest permutation unsortable by
+three stacks in series."
+
+So for t = 3 the conjecture is that *every* permutation of length ≤ 4! = 24
+is sortable, and hence that the answer is 25. The length-24 permutation above
+is unsortable, so the conjecture is false: it is a counterexample sitting
+exactly at the boundary the conjecture predicts.
 
 ## Exhaustive counts of sortable permutations
 
