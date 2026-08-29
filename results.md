@@ -228,7 +228,7 @@ k3_n29_9d1e218c  VERIFIED   k3_n33_10985bce  VERIFIED
 Reproduce:
 
 ```
-python -m pytest                                   # 250 tests
+python -m pytest                                   # 253 tests
 python scripts/verify_basis.py --perm 6-11-4-16-2-8-19-5-14-9-17-12-20-3-15-7-23-10-21-18-13-22-1
 python proofcheck.py                               # drat-trim over every UNSAT claim
 python verify.py claims results/claims.json        # replay every SAT claim

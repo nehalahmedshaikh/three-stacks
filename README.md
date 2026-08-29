@@ -100,7 +100,7 @@ random n=40  →  33  →  29  →  28 → 26 → 25 → 24
 
 ```bash
 python -m venv .venv && .venv/Scripts/pip install python-sat pytest
-python -m pytest                        # 130 tests
+python -m pytest                        # 253 tests (3 are slow; -m "not slow" skips them)
 
 # replay a sorting run by hand — no solver involved
 python verify.py replay 231 --k 2 --ops 112123233

@@ -14,8 +14,9 @@ results/witnesses.jsonl
 
 # Certificates are large and fully regenerable:
 #   python scripts/certify.py --perm <perm> --k 3
-# Only the headline length-24 pair is committed, so a reader can check the
-# claim without running a solver first.  Everything else is ignored.
+# Only the length-23 and length-24 pairs are committed, so a reader can check
+# the headline claim without running a solver first.  Everything else is
+# ignored and regenerates from the permutation.
 proofs/*.cnf
 proofs/*.drat
 !proofs/k3_n23_4a24b696.cnf
