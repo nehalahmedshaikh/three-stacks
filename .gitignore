@@ -1,0 +1,22 @@
+.venv/
+__pycache__/
+*.pyc
+*.egg-info/
+.pytest_cache/
+
+# built third-party checkers/solvers (see README for how to build them)
+tools/
+drat-trim/
+cadical/
+
+# scratch sweeps; the curated witnesses live in results/claims.json
+results/witnesses.jsonl
+
+# Certificates are large and fully regenerable:
+#   python scripts/certify.py --perm <perm> --k 3
+# Only the headline length-24 pair is committed, so a reader can check the
+# claim without running a solver first.  Everything else is ignored.
+proofs/*.cnf
+proofs/*.drat
+!proofs/k3_n24_3a74bbc0.cnf
+!proofs/k3_n24_3a74bbc0.drat

@@ -1,0 +1,26 @@
+{
+  "id": "k3_n29_9d1e218c",
+  "perm": "12-3-9-14-21-25-13-11-17-2-7-23-28-6-26-16-8-29-5-18-10-22-24-20-15-4-19-27-1",
+  "n": 29,
+  "k": 3,
+  "sortable": false,
+  "encoding": "full",
+  "n_vars": 6670,
+  "n_clauses": 509499,
+  "solver": "cadical195",
+  "solve_seconds": 17.812,
+  "cnf": "proofs/k3_n29_9d1e218c.cnf",
+  "drat": "proofs/k3_n29_9d1e218c.drat",
+  "drat_lines": 585487,
+  "evidence": "DRAT certificate (check with proofcheck.py)",
+  "second_solver": {
+    "name": "glucose4",
+    "sortable": false,
+    "agrees": true
+  },
+  "brute_force": {
+    "sortable": null,
+    "agrees": null,
+    "note": "gave up after 5000001 nodes"
+  }
+}

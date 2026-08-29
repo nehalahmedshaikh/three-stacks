@@ -1,0 +1,17 @@
+[project]
+name = "three-stacks"
+version = "0.1.0"
+description = "Hunting the shortest permutation that three stacks in series cannot sort"
+requires-python = ">=3.10"
+dependencies = ["python-sat>=1.8"]
+
+[project.optional-dependencies]
+dev = ["pytest>=8"]
+
+[tool.setuptools]
+packages = ["unsortable"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+markers = ["slow: takes minutes; deselect with -m 'not slow'"]
+filterwarnings = ["ignore::DeprecationWarning"]

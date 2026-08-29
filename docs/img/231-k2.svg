@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 382 282" width="382" height="282" role="img">
+<style>:root{--bg:#ffffff;--fg:#1b1f24;--muted:#6b7280;--lane:#f1f3f5;}@media (prefers-color-scheme: dark){:root{--bg:#0d1117;--fg:#e6edf3;--muted:#8b949e;--lane:#161b22;}}
+    text { font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace; }
+    .lane { fill: var(--lane); }
+    .lbl  { fill: var(--fg); font-size: 13px; font-weight: 600; }
+    .tick { fill: var(--muted); font-size: 10px; }
+    .val  { fill: #fff; font-size: 11px; font-weight: 700; }
+    .cap  { fill: var(--muted); font-size: 11px; }
+    </style>
+<rect width="382" height="282" fill="var(--bg)"/>
+<text class="lbl" x="8" y="30">in</text>
+<rect x="57.0" y="16" width="28.0" height="15" rx="3" fill="#f58518"/><text class="val" x="71.0" y="27.5" text-anchor="middle">2</text>
+<rect x="87.0" y="16" width="28.0" height="15" rx="3" fill="#54a24b"/><text class="val" x="101.0" y="27.5" text-anchor="middle">3</text>
+<rect x="117.0" y="16" width="28.0" height="15" rx="3" fill="#4c78a8"/><text class="val" x="131.0" y="27.5" text-anchor="middle">1</text>
+<rect x="56" y="52" width="270" height="58" rx="6" class="lane"/>
+<text class="lbl" x="8" y="68">S1</text>
+<rect x="56.0" y="62" width="30.0" height="15" rx="3" fill="#f58518" fill-opacity="0.92"/>
+<text class="val" x="71.0" y="73.5" text-anchor="middle">2</text>
+<rect x="116.0" y="62" width="150.0" height="15" rx="3" fill="#54a24b" fill-opacity="0.92"/>
+<text class="val" x="191.0" y="73.5" text-anchor="middle">3</text>
+<rect x="146.0" y="81" width="30.0" height="15" rx="3" fill="#4c78a8" fill-opacity="0.92"/>
+<text class="val" x="161.0" y="92.5" text-anchor="middle">1</text>
+<rect x="56" y="118" width="270" height="58" rx="6" class="lane"/>
+<text class="lbl" x="8" y="134">S2</text>
+<rect x="86.0" y="128" width="150.0" height="15" rx="3" fill="#f58518" fill-opacity="0.92"/>
+<text class="val" x="161.0" y="139.5" text-anchor="middle">2</text>
+<rect x="266.0" y="128" width="30.0" height="15" rx="3" fill="#54a24b" fill-opacity="0.92"/>
+<text class="val" x="281.0" y="139.5" text-anchor="middle">3</text>
+<rect x="176.0" y="147" width="30.0" height="15" rx="3" fill="#4c78a8" fill-opacity="0.92"/>
+<text class="val" x="191.0" y="158.5" text-anchor="middle">1</text>
+<text class="lbl" x="8" y="208">out</text>
+<rect x="207.0" y="194" width="28.0" height="15" rx="3" fill="#4c78a8"/><text class="val" x="221.0" y="205.5" text-anchor="middle">1</text>
+<rect x="237.0" y="194" width="28.0" height="15" rx="3" fill="#f58518"/><text class="val" x="251.0" y="205.5" text-anchor="middle">2</text>
+<rect x="297.0" y="194" width="28.0" height="15" rx="3" fill="#54a24b"/><text class="val" x="311.0" y="205.5" text-anchor="middle">3</text>
+<text class="cap" x="56" y="260">231  &#183;  2 stacks in series  &#183;  9 operations</text>
+<text class="cap" x="56" y="274">121123323</text>
+</svg>

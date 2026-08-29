@@ -1,0 +1,248 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Three stacks in series</title>
+<style>
+  :root {
+    --bg:#ffffff; --panel:#f6f7f9; --edge:#e3e6ea; --fg:#1b1f24; --muted:#616a75;
+    --accent:#2f6fdd; --bad:#d1394b; --good:#2e8b57;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root { --bg:#0d1117; --panel:#161b22; --edge:#2b313a; --fg:#e6edf3;
+            --muted:#8b949e; --accent:#5b9dff; --bad:#f47c8c; --good:#5fd08a; }
+  }
+  * { box-sizing:border-box; }
+  body { margin:0; padding:28px 20px 60px; background:var(--bg); color:var(--fg);
+         font:15px/1.55 ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,sans-serif; }
+  main { max-width:1000px; margin:0 auto; }
+  h1 { font-size:22px; margin:0 0 4px; letter-spacing:-0.01em; }
+  p.sub { margin:0 0 22px; color:var(--muted); }
+  .controls { display:flex; flex-wrap:wrap; gap:10px; align-items:center;
+              padding:14px; background:var(--panel); border:1px solid var(--edge);
+              border-radius:10px; margin-bottom:16px; }
+  label { font-size:13px; color:var(--muted); }
+  input[type=text] { font:14px ui-monospace,Menlo,Consolas,monospace; padding:7px 10px;
+                     border:1px solid var(--edge); border-radius:7px; background:var(--bg);
+                     color:var(--fg); width:230px; }
+  select, button { font:14px inherit; padding:7px 12px; border:1px solid var(--edge);
+                   border-radius:7px; background:var(--bg); color:var(--fg); cursor:pointer; }
+  button.primary { background:var(--accent); border-color:var(--accent); color:#fff; font-weight:600; }
+  button:disabled { opacity:.45; cursor:default; }
+  #status { margin:0 0 16px; font-size:14px; min-height:22px; }
+  #status.bad { color:var(--bad); } #status.good { color:var(--good); }
+  .machine { display:grid; grid-template-columns:auto 1fr auto; gap:18px;
+             align-items:end; padding:20px 16px; background:var(--panel);
+             border:1px solid var(--edge); border-radius:10px; overflow-x:auto; }
+  .queue { display:flex; gap:4px; align-items:flex-end; min-height:40px; }
+  .stacks { display:flex; gap:26px; justify-content:center; align-items:flex-end; }
+  .stack { display:flex; flex-direction:column-reverse; gap:4px; align-items:center;
+           min-width:52px; min-height:60px; padding:6px 5px 4px;
+           border:1px solid var(--edge); border-bottom-width:3px; border-radius:0 0 8px 8px;
+           border-top:none; }
+  .stack .name { position:absolute; }
+  .cell { width:34px; height:26px; border-radius:5px; display:grid; place-items:center;
+          color:#fff; font:600 13px ui-monospace,Menlo,Consolas,monospace;
+          transition:transform .18s ease, opacity .18s ease; }
+  .caption { text-align:center; font-size:12px; color:var(--muted); margin-top:6px; }
+  .colhead { text-align:center; font-size:12px; color:var(--muted); margin-bottom:6px; }
+  #ops { font:12px ui-monospace,Menlo,Consolas,monospace; color:var(--muted);
+         word-break:break-all; margin-top:14px; }
+  #ops b { color:var(--accent); }
+  .legend { margin-top:22px; font-size:13px; color:var(--muted); }
+  code { font:13px ui-monospace,Menlo,Consolas,monospace;
+         background:var(--panel); padding:1px 5px; border-radius:4px; }
+</style>
+</head>
+<body>
+<main>
+  <h1>Three stacks in series</h1>
+  <p class="sub">input &rarr; S1 &rarr; S2 &rarr; S3 &rarr; output. Each element enters every
+     stack once, in order. Can the machine emit 1,2,3,&hellip;?</p>
+
+  <div class="controls">
+    <label for="perm">permutation</label>
+    <input id="perm" type="text" value="51742638" spellcheck="false">
+    <label for="k">stacks</label>
+    <select id="k"><option>1</option><option>2</option><option selected>3</option></select>
+    <button class="primary" id="solve">Sort it</button>
+    <button id="play">Play</button>
+    <button id="step">Step</button>
+    <button id="reset">Reset</button>
+    <label for="speed">speed</label>
+    <input id="speed" type="range" min="1" max="20" value="9" style="width:110px">
+    <button id="rand">Random</button>
+  </div>
+
+  <p id="status"></p>
+
+  <div class="machine">
+    <div><div class="colhead">input</div><div class="queue" id="input"></div></div>
+    <div>
+      <div class="colhead">stacks</div>
+      <div class="stacks" id="stacks"></div>
+    </div>
+    <div><div class="colhead">output</div><div class="queue" id="output"></div></div>
+  </div>
+  <div id="ops"></div>
+
+  <p class="legend">
+    Every element performs <code>r1</code> (input&rarr;S1), <code>r2</code> (S1&rarr;S2),
+    <code>r3</code> (S2&rarr;S3), <code>r4</code> (S3&rarr;output) exactly once, so a run is
+    always <code>4n</code> operations. One stack sorts exactly the permutations avoiding
+    <code>231</code>; two stacks first fail at length 7 (e.g. <code>2435761</code>); three
+    stacks sort everything up to at least length 13.
+  </p>
+</main>
+
+<script>
+const PALETTE = ["#4c78a8","#f58518","#54a24b","#e45756","#72b7b2","#b279a2",
+                 "#ff9da6","#9d755d","#eeca3b","#bab0ac"];
+const $ = id => document.getElementById(id);
+
+function parsePerm(s) {
+  s = s.trim();
+  const vals = /[ ,-]/.test(s) ? s.split(/[\s,\-]+/).filter(Boolean).map(Number)
+                               : [...s].map(Number);
+  const sorted = [...vals].sort((a,b)=>a-b);
+  const ok = vals.length > 0 && sorted.every((v,i)=>v===i+1);
+  return ok ? vals : null;
+}
+
+/* Same search as unsortable/simulator.py: memoised DFS with
+   P1 (S_k increasing top-to-bottom) and P2 (forced output). */
+function sortingSequence(perm, k) {
+  const n = perm.length, last = k-1, seen = new Set(), ops = [];
+  function rec(i, stacks, outCount) {
+    if (outCount === n) return true;
+    const key = i + "|" + stacks.map(s=>s.join(",")).join("|");
+    if (seen.has(key)) return false;
+    seen.add(key);
+    const top = stacks[last].length ? stacks[last][stacks[last].length-1] : null;
+    if (top === outCount + 1) {                       // P2: forced output
+      const ns = stacks.map(s=>s.slice()); ns[last].pop();
+      ops.push(k+1);
+      if (rec(i, ns, outCount+1)) return true;
+      ops.pop(); return false;
+    }
+    for (let j = k; j >= 2; j--) {
+      const src = j-2, dst = j-1;
+      if (!stacks[src].length) continue;
+      const v = stacks[src][stacks[src].length-1];
+      if (dst === last && stacks[last].length &&
+          v > stacks[last][stacks[last].length-1]) continue;   // P1
+      const ns = stacks.map(s=>s.slice()); ns[src].pop(); ns[dst].push(v);
+      ops.push(j);
+      if (rec(i, ns, outCount)) return true;
+      ops.pop();
+    }
+    if (i < n) {
+      const v = perm[i];
+      if (!(k === 1 && stacks[0].length && v > stacks[0][stacks[0].length-1])) {
+        const ns = stacks.map(s=>s.slice()); ns[0].push(v);
+        ops.push(1);
+        if (rec(i+1, ns, outCount)) return true;
+        ops.pop();
+      }
+    }
+    return false;
+  }
+  const empty = Array.from({length:k}, ()=>[]);
+  return rec(0, empty, 0) ? ops.slice() : null;
+}
+
+let state = null, timer = null;
+
+function cell(v) {
+  const d = document.createElement("div");
+  d.className = "cell";
+  d.textContent = v;
+  d.style.background = PALETTE[(v-1) % PALETTE.length];
+  return d;
+}
+
+function makeState(perm, k, ops) {
+  return { perm, k, ops, t: 0, read: 0, stacks: Array.from({length:k},()=>[]), out: [] };
+}
+
+function applyOp(st) {
+  if (st.t >= st.ops.length) return false;
+  const op = st.ops[st.t++];
+  if (op === 1) st.stacks[0].push(st.perm[st.read++]);
+  else if (op <= st.k) st.stacks[op-1].push(st.stacks[op-2].pop());
+  else st.out.push(st.stacks[st.k-1].pop());
+  return true;
+}
+
+function draw() {
+  const st = state;
+  const inp = $("input"), outp = $("output"), stk = $("stacks");
+  inp.innerHTML = ""; outp.innerHTML = ""; stk.innerHTML = "";
+  for (let i = st.read; i < st.perm.length; i++) inp.appendChild(cell(st.perm[i]));
+  for (let s = 0; s < st.k; s++) {
+    const wrap = document.createElement("div");
+    const col = document.createElement("div");
+    col.className = "stack";
+    st.stacks[s].forEach(v => col.appendChild(cell(v)));
+    wrap.appendChild(col);
+    const cap = document.createElement("div");
+    cap.className = "caption"; cap.textContent = "S" + (s+1);
+    wrap.appendChild(cap);
+    stk.appendChild(wrap);
+  }
+  st.out.forEach(v => outp.appendChild(cell(v)));
+  const s = st.ops.map(String).join("");
+  $("ops").innerHTML = "<b>" + s.slice(0, st.t) + "</b>" + s.slice(st.t);
+}
+
+function stop() { if (timer) { clearInterval(timer); timer = null; $("play").textContent = "Play"; } }
+
+function solve() {
+  stop();
+  const perm = parsePerm($("perm").value);
+  const k = +$("k").value;
+  const st = $("status");
+  if (!perm) { st.className = "bad"; st.textContent = "Not a permutation of 1..n."; return; }
+  if (perm.length > 13) { st.className = "bad";
+    st.textContent = "Length " + perm.length + " is too slow for the in-browser search "
+                   + "(use the Python tools for anything bigger)."; return; }
+  const t0 = performance.now();
+  const ops = sortingSequence(perm, k);
+  const ms = Math.round(performance.now() - t0);
+  if (!ops) {
+    st.className = "bad";
+    st.textContent = perm.join(",") + " is NOT sortable by " + k
+                   + (k === 1 ? " stack" : " stacks in series") + " (" + ms + " ms).";
+    state = makeState(perm, k, []); draw(); return;
+  }
+  st.className = "good";
+  st.textContent = "Sortable by " + k + (k === 1 ? " stack" : " stacks in series")
+                 + " in " + ops.length + " operations (" + ms + " ms).";
+  state = makeState(perm, k, ops);
+  draw();
+}
+
+$("solve").onclick = solve;
+$("reset").onclick = () => { stop(); if (state) { state = makeState(state.perm, state.k, state.ops); draw(); } };
+$("step").onclick = () => { stop(); if (state && applyOp(state)) draw(); };
+$("play").onclick = () => {
+  if (timer) { stop(); return; }
+  if (!state || !state.ops.length) return;
+  if (state.t >= state.ops.length) state = makeState(state.perm, state.k, state.ops);
+  $("play").textContent = "Pause";
+  const ms = 1100 / +$("speed").value;
+  timer = setInterval(() => { if (!applyOp(state)) stop(); draw(); }, ms);
+};
+$("rand").onclick = () => {
+  const n = 6 + Math.floor(Math.random()*5);
+  const a = Array.from({length:n},(_,i)=>i+1);
+  for (let i = n-1; i > 0; i--) { const j = Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; }
+  $("perm").value = a.join("-"); solve();
+};
+$("perm").addEventListener("keydown", e => { if (e.key === "Enter") solve(); });
+$("k").onchange = solve;
+solve();
+</script>
+</body>
+</html>

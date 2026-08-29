@@ -1,0 +1,26 @@
+{
+  "id": "k3_n25_b6356c09",
+  "perm": "7-17-2-19-10-4-21-8-14-3-20-11-25-5-22-13-6-15-9-18-23-12-16-24-1",
+  "n": 25,
+  "k": 3,
+  "encoding": "full",
+  "n_vars": 4950,
+  "n_clauses": 325323,
+  "cnf": "proofs/k3_n25_b6356c09.cnf",
+  "sortable": false,
+  "solver": "cadical.exe (external, file-backed proof)",
+  "solve_seconds": 11.32,
+  "drat": "proofs/k3_n25_b6356c09.drat",
+  "drat_bytes": 6384455,
+  "evidence": "DRAT certificate (check with proofcheck.py)",
+  "second_solver": {
+    "name": "glucose4 (pysat)",
+    "sortable": false,
+    "agrees": true
+  },
+  "brute_force": {
+    "sortable": null,
+    "agrees": null,
+    "note": "gave up after 5000001 nodes"
+  }
+}
