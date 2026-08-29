@@ -6,19 +6,20 @@ combination of checks listed in [Verification](#verification) at the bottom.
 ## The headline
 
 **The shortest permutation not sortable by three stacks in series has length
-at most 23**, witnessed by
+at most 22**, witnessed by
 
 ```
-6-11-4-16-2-8-19-5-14-9-17-12-20-3-15-7-23-10-21-18-13-22-1
+6-14-2-10-4-18-7-12-3-20-15-9-5-19-13-22-8-17-11-21-16-1
 ```
 
 which is a **basis element** of the 3-stack-sortable class: it is unsortable,
-and all 23 of its one-point deletions are sortable.
+and all 22 of its one-point deletions are sortable.
 
-Artifacts: [`proofs/k3_n23_4a24b696.cnf`](proofs/), `.drat`, `.json`, and
-[`results/basis_k3_n23.json`](results/) (operation words for all 23
-deletions). A second, independently found basis element of length 24 is also
-certified, as are ones of length 25, 29 and 33.
+Artifacts: [`proofs/k3_n22_332bfe43.cnf`](proofs/), `.drat`, `.json`, and
+[`results/basis_k3_n22.json`](results/) (operation words for all 22
+deletions). Basis elements of length 23 and 24 are separately certified, as
+are witnesses of length 25, 29 and 33. Every distinct basis element found is
+recorded in [`results/basis_elements.json`](results/basis_elements.json).
 
 ### State of the problem
 
@@ -27,7 +28,7 @@ certified, as are ones of length 25, 29 and 33.
 | lower bound -- all shorter permutations sort | >= 14 | Atkinson; every permutation of length 7*2^(t-2)-1 = 13 is 3-stack-sortable |
 | Elder's guess | 15 | Elder-Waton wager |
 | Waton's guess | 22 | Elder-Waton wager |
-| **this repo** | **<= 23** | verified, certificate included |
+| **this repo** | **<= 22** | verified, certificate included |
 | Murphy's conjecture | 25 | **refuted** -- see below |
 | Atkinson 1992, Lemma 5 | <= 38 | previous record, "has stood for over thirty years" |
 | Murphy | <= 39 / 43 | never presented |
@@ -42,7 +43,8 @@ stacks is presented anywhere** -- not Tarjan's, not Murphy's, not Atkinson's
 38. As far as we can tell the permutations here are the first explicit,
 independently checkable witnesses of any length.
 
-So the answer lies in **[14, 23]**, one step from Waton's guess of 22.
+So the answer lies in **[14, 22]** -- exactly Waton's guess of 22, and 7 above
+Elder's 15.
 
 ### Murphy's conjecture, precisely
 
@@ -54,7 +56,7 @@ three stacks in series."
 So for t = 3 the conjecture is that *every* permutation of length <= 4! = 24
 is sortable, and hence that the answer is 25. The length-24 witness alone
 already refutes it -- a counterexample sitting exactly on the boundary the
-conjecture predicts -- and the length-23 one puts it further out of reach.
+conjecture predicts -- and the length-22 one puts it well out of reach.
 
 ## Exhaustive counts of sortable permutations
 
@@ -119,10 +121,12 @@ random n=40 witness
   -> 33   greedy descent (basis element)
   -> 29   greedy descent, different seed (basis element)
   -> 28 -> 26 -> 25 -> 24        basin hopping
-  -> 23                          basin hopping + plateau drift
+  -> 23 -> 22                    basin hopping + plateau drift
 ```
 
-Certified basis elements: **23**, 24, 25, 29, 33.
+Certified basis elements: **22**, 23, 24; certified witnesses at 25, 29, 33.
+Thirteen distinct basis elements in total, listed in
+[`results/basis_elements.json`](results/basis_elements.json).
 
 ## The counting ceiling (M6)
 
@@ -138,7 +142,7 @@ Once n! > B_k(n) an unsortable permutation must exist. Exact crossovers:
 |---:|---:|---|
 | 1 | **3** | **3** (`231`) -- the bound is exactly tight |
 | 2 | 50 | 7 |
-| 3 | **642** | in [14, 23] |
+| 3 | **642** | in [14, 22] |
 | 4 | 8,383 | unknown |
 
 Rigorous and search-free, but weak for k >= 2 -- it is 7x the truth at k = 2.
@@ -149,11 +153,12 @@ because B_3(n) ~ 256^n and n! only overtakes that around n ~ e*256.)
 ## What the basis elements look like
 
 `scripts/analyse_basis.py` over the distinct basis elements found so far
-(lengths 23, 24, 25, 26x2, 27, 28x2, 29x2):
+(lengths 22, 23, 24, 25, 26x2, 27, 28x2, 29x2, 31, 33):
 
-* **Nine of the ten end in `1`.** Under a uniform model a permutation ends in
-  1 with probability 1/n ~ 4%, so this is on the order of 1e-12. There is a
-  clean mechanical reason: if `1` is the *last* input element, then at the
+* **Eleven of the thirteen end in `1`**, and both exceptions are among the
+  longest (29 and 33). Under a uniform model a permutation ends in 1 with
+  probability 1/n ~ 4%, so eleven of thirteen is astronomically unlikely by
+  chance. There is a clean mechanical reason: if `1` is the *last* input element, then at the
   moment it arrives every other value is already distributed across the three
   stacks, and every one of them must leave *after* `1` -- in whatever LIFO
   order it happens to be frozen in. Putting `1` last maximises the pressure
@@ -181,6 +186,39 @@ families) yields nothing, and why descending from long random witnesses was
 the approach that worked. Combined with the inversion-density observation
 above, the short basis elements appear to sit in a narrow band: too ordered
 and three stacks cope easily, too disordered and the witness is long.
+
+## Is the model even right?
+
+The bounds here are worthless if we are simulating the wrong machine. A model
+*more restrictive* than "three stacks in series" would call permutations
+unsortable that really are sortable, and every number above would be too
+small. This is the one failure mode that no amount of solver verification
+catches, because the solver would be faithfully answering the wrong question.
+
+The literature supplies sharp, falsifiable predictions at three different
+points, and the model hits all of them:
+
+| prediction | source | what we get |
+|---|---|---|
+| 1 stack sorts exactly `Av(231)`, counted by the Catalan numbers | Knuth | exact, permutation by permutation to n = 7; counts match to n = 11 (58,786 = C(11)) |
+| 2 stacks in series first fail at length **7** | Tarjan | exactly 7 -- not 6 (too restrictive), not 8 (too permissive) |
+| every permutation of length <= 13 is 3-stack-sortable | Atkinson | 800 random permutations at n = 12 and n = 13: **zero** unsortable |
+
+That last row is the direct test (`python scripts/validate_model.py`). If our
+machine were even slightly too restrictive, sampling right at the top of the
+known-sortable range is where it would show, and it does not. Every one of
+those 800 sortable verdicts also came with an operation word that was
+*replayed* on the independent simulator in `verify.py` and really did sort --
+so the SAT solver is not merely saying "satisfiable", it is producing runs
+that work.
+
+A model error would have to be wrong in a way that simultaneously reproduces
+Catalan numbers at k = 1, lands exactly on 7 at k = 2, and leaves everything
+below 14 sortable at k = 3. The remaining honest gap is that all three checks
+live at n <= 13, and the witnesses are at n = 22. The encoding has no
+size-dependent logic -- clause generation is uniform in n -- so there is no
+natural mechanism for it to become wrong only above 13, but it is not
+something the checks above rule out.
 
 ## Negative results worth recording
 
@@ -218,18 +256,18 @@ Every claim in this file passes the checks that apply to it.
 | "pi is a basis element" | the above, plus n replayed operation words, one per one-point deletion |
 | the encoding itself | proved in [docs/notes.md](docs/notes.md) §3, and exhaustively equal to brute force for k = 1,2,3 at n <= 7 in both encoding modes, sampled to n = 11 |
 
-All five certificates currently in `proofs/` verify:
+All six certificates currently in `proofs/` verify:
 
 ```
-k3_n23_4a24b696  VERIFIED   k3_n24_3a74bbc0  VERIFIED   k3_n25_b6356c09  VERIFIED
-k3_n29_9d1e218c  VERIFIED   k3_n33_10985bce  VERIFIED
+k3_n22_332bfe43  VERIFIED   k3_n23_4a24b696  VERIFIED   k3_n24_3a74bbc0  VERIFIED
+k3_n25_b6356c09  VERIFIED   k3_n29_9d1e218c  VERIFIED   k3_n33_10985bce  VERIFIED
 ```
 
 Reproduce:
 
 ```
 python -m pytest                                   # 253 tests
-python scripts/verify_basis.py --perm 6-11-4-16-2-8-19-5-14-9-17-12-20-3-15-7-23-10-21-18-13-22-1
+python scripts/verify_basis.py --perm 6-14-2-10-4-18-7-12-3-20-15-9-5-19-13-22-8-17-11-21-16-1
 python proofcheck.py                               # drat-trim over every UNSAT claim
 python verify.py claims results/claims.json        # replay every SAT claim
 ```
@@ -242,7 +280,7 @@ docs/notes.md §3 and by exhaustive agreement with brute force. A reader who
 distrusts the encoding should check that proof; a reader who distrusts the
 solver should run drat-trim. The two are independent, deliberately.
 
-The brute-force simulator cannot reach n = 23, so at that size the simulator
+The brute-force simulator cannot reach n = 22, so at that size the simulator
 leg is absent and the encoding's correctness is carried by its agreement at
 small n. This is the weakest link in the chain and is stated plainly rather
 than buried.

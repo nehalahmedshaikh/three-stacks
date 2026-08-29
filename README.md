@@ -1,10 +1,10 @@
 # three-stacks
 
-**A permutation of length 23 that three stacks in series cannot sort — with a
+**A permutation of length 22 that three stacks in series cannot sort — with a
 machine-checkable proof.**
 
 ```
-6-11-4-16-2-8-19-5-14-9-17-12-20-3-15-7-23-10-21-18-13-22-1
+6-14-2-10-4-18-7-12-3-20-15-9-5-19-13-22-8-17-11-21-16-1
 ```
 
 The previous record was 38 (Atkinson, 1992), and it had stood for over thirty
@@ -12,16 +12,17 @@ years. No explicit witness had ever been published, at any length — not
 Tarjan's claimed 41, not Murphy's 39, not Atkinson's 38. This one comes with
 a DRAT certificate that anyone can check with someone else's checker.
 
-It is also a **basis element**: unsortable, but every one of its 23 one-point
+It is also a **basis element**: unsortable, but every one of its 22 one-point
 deletions *is* sortable, each with an explicit operation word you can replay
 by hand. So the shortest permutation three stacks cannot sort has length
-somewhere in **[14, 23]** — one step from Waton's guess of 22.
+somewhere in **[14, 22]** — exactly Waton's guess.
 
 Along the way this refutes **Murphy's conjecture** that t stacks in series
-sort everything up to length (t+1)! — which for t = 3 predicts that all
-permutations of length ≤ 24 sort, and that the answer is 25. The witness
-above is unsortable and has length exactly 24, landing precisely on the
-boundary the conjecture claims.
+sort everything up to length (t+1)! — which for t = 3 predicts that every
+permutation of length ≤ 24 is sortable, and that the answer is 25. The
+witness above has length 22, well inside the range the conjecture claims is
+entirely sortable. (A separately certified length-24 basis element sits
+exactly on the boundary.)
 
 Full numbers, provenance, and caveats: **[results.md](results.md)**.
 
@@ -89,11 +90,14 @@ witness is easy; the work is shrinking it.
 basis element it happens to reach (33, then 29). But unsortability is closed
 *upward*, so inserting points into a witness keeps it a witness — for free,
 with no search. Perturb up, descend again on a fresh random path, keep the
-best:
+best. Accepting *equal-length* results as the new starting point matters as
+much as the perturbation: without it the walk keeps re-perturbing one
+permutation and never drifts, and the run sat at 24 for over a hundred
+iterations before that change went in.
 
 ```
-random n=40  →  33  →  29  →  28 → 26 → 25 → 24
-                greedy        basin hopping
+random n=40  →  33  →  29  →  28 → 26 → 25 → 24  →  23 → 22
+                greedy        basin hopping         + plateau drift
 ```
 
 ## Verify it yourself
@@ -109,7 +113,7 @@ python verify.py replay 231 --k 2 --ops 112123233
 python verify.py exhaust 2435761 --k 2
 
 # the headline claim, end to end
-python scripts/verify_basis.py --perm 6-15-2-17-9-4-19-7-13-3-18-10-24-5-20-12-23-8-16-21-11-14-22-1
+python scripts/verify_basis.py --perm 6-14-2-10-4-18-7-12-3-20-15-9-5-19-13-22-8-17-11-21-16-1
 python proofcheck.py                    # drat-trim over every UNSAT claim
 ```
 
@@ -132,7 +136,8 @@ python scripts/hunt.py hop --perm <witness> --workers 8        # basin hop
 python scripts/certify.py --perm <witness>                     # make artifacts
 ```
 
-Getting below 22 would side with Elder against Waton; 15 would settle the bet.
+The bound now sits exactly on Waton's guess of 22. Anything below it sides with
+Elder; 15 would settle the bet outright.
 
 ## Layout
 
@@ -151,14 +156,15 @@ Getting below 22 would side with Elder against Waton; 15 would settle the bet.
 
 ## Caveats
 
-* **Upper bound, not an answer.** 24 is a basis element, not proven minimal.
-  The truth is in [14, 24].
+* **Upper bound, not an answer.** 22 is a basis element — no *deletion* of it
+  is unsortable — but that does not make it the shortest such permutation
+  anywhere. The truth is in [14, 22].
 * **Not peer reviewed.** Verified is not refereed.
 * **The certificate proves the CNF is unsatisfiable**, not that the CNF asks
   the right question. That is what the encoding proof and the exhaustive
   brute-force agreement are for — see
   [results.md § Verification](results.md#verification).
-* **Brute force cannot reach n = 24**, so at that size the simulator cannot
+* **Brute force cannot reach n = 22**, so at that size the simulator cannot
   independently re-decide the instance. Stated plainly in results.md rather
   than buried.
 * Literature figures are taken from Vatter,

@@ -12,7 +12,7 @@ in results/witnesses.jsonl:
   * do they share small patterns more often than random permutations of the
     same length do?  That is the first place an infinite family would show.
 
-    python scripts/analyse_basis.py --min-length 24 --max-length 26
+    python scripts/analyse_basis.py --min-length 23 --max-length 26
 """
 
 from __future__ import annotations
@@ -44,8 +44,7 @@ def load_basis_elements(min_len: int, max_len: int, k: int) -> list[Perm]:
                 continue
             if min_len <= row["n"] <= max_len:
                 seen[from_string(row["perm"])] = None
-    bf = ROOT / "results" / "basis_k3_n24.json"
-    if bf.exists():
+    for bf in sorted((ROOT / "results").glob(f"basis_k{k}_n*.json")):
         d = json.loads(bf.read_text())
         if d.get("is_basis_element") and min_len <= d["n"] <= max_len:
             seen[from_string(d["perm"])] = None

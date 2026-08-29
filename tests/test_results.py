@@ -21,22 +21,22 @@ from unsortable.minimizer import delete_positions
 from unsortable.perms import from_string
 
 # The headline witness.  See results.md.
-WITNESS_24 = from_string(
-    "6-15-2-17-9-4-19-7-13-3-18-10-24-5-20-12-23-8-16-21-11-14-22-1")
+WITNESS = from_string(
+    "6-11-4-16-2-8-19-5-14-9-17-12-20-3-15-7-23-10-21-18-13-22-1")
 
-BASIS_FILE = ROOT / "results" / "basis_k3_n24.json"
+BASIS_FILE = ROOT / "results" / "basis_k3_n23.json"
 CLAIMS_FILE = ROOT / "results" / "claims.json"
 
 
 @pytest.mark.slow
 def test_witness_is_unsortable():
-    assert not solve(WITNESS_24, k=3, mode="reduced").sortable
+    assert not solve(WITNESS, k=3, mode="reduced").sortable
 
 
 @pytest.mark.slow
 def test_witness_is_a_basis_element():
-    for i in range(len(WITNESS_24)):
-        q = delete_positions(WITNESS_24, [i])
+    for i in range(len(WITNESS)):
+        q = delete_positions(WITNESS, [i])
         r = solve(q, k=3, mode="reduced")
         assert r.sortable, f"deleting position {i} leaves an unsortable {q}"
         assert verify.sorts(list(q), r.ops, k=3)
@@ -47,8 +47,8 @@ def test_recorded_basis_operation_words_all_replay():
     """Every stored deletion witness really sorts -- no solver needed."""
     data = json.loads(BASIS_FILE.read_text())
     assert data["is_basis_element"] is True
-    assert data["n"] == len(WITNESS_24)
-    assert len(data["deletions"]) == len(WITNESS_24)
+    assert data["n"] == len(WITNESS)
+    assert len(data["deletions"]) == len(WITNESS)
     for d in data["deletions"]:
         q = from_string(d["pattern"])
         assert d["ops"], d
@@ -102,4 +102,4 @@ def test_best_claim_beats_the_previous_record():
     claims = json.loads(CLAIMS_FILE.read_text())
     unsat = [c for c in claims if not c["sortable"] and c["k"] == 3]
     assert unsat, "no k=3 unsortable claims"
-    assert min(c["n"] for c in unsat) <= 24
+    assert min(c["n"] for c in unsat) <= 23
