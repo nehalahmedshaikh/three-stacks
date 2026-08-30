@@ -299,6 +299,48 @@ it carries no signal pointing at it. Progress below 22 needs a *construction*
 -- a reason certain permutations must be unsortable -- rather than any search
 that has to be led there by local information.
 
+## What the refutation actually says
+
+A DRAT proof certifies a contradiction but does not explain it.  drat-trim's
+`-c` flag extracts the **unsatisfiable core** -- the subset of the original
+constraints that participate -- and mapping those clauses back to what they
+encode says *why* a permutation is unsortable.  Two independent witnesses
+(`scripts/core.py`):
+
+| | length 22 | length 24 |
+|---|---:|---:|
+| core size | 6,121 / 220,966 (2.8%) | 7,823 / 287,534 (2.7%) |
+| input-order constraints used | **21 of 21** | **23 of 23** |
+| output-order constraints used | **21 of 21** | **23 of 23** |
+| non-crossing on S1 | 188 | 234 |
+| non-crossing on **S2** | **317** | **380** |
+| non-crossing on S3 | 190 | 234 |
+
+Three things fall out, and they agree across both:
+
+* **Every input and output constraint is needed.** Not a single one is
+  dispensable, which is what being a basis element looks like at the level
+  of the proof rather than by definition.
+* **S1 and S3 carry near-identical load, and the middle stack carries about
+  1.65x either** (317 vs 189, 380 vs 234).  That is a sharp invariant.  It
+  has a natural reading: S1 is pinned by the input order and S3 by the output
+  order plus its monotonicity invariant, so S2 is the free buffer that has to
+  absorb the mismatch -- and the obstruction is precisely that it cannot.
+* **The core is dense, not local.** 2.8% of the clauses, but spread over
+  every value and every ordering constraint.  There is no small gadget
+  driving the contradiction.
+
+That last point is the explanation for the wall.  Unsortability here is a
+global property of all the interleavings at once, not something a short
+sub-pattern certifies -- which is exactly why local search finds no gradient
+(f = 0 off the witness), why no pruning is available (there is no short
+obstruction to prune with), and why the witnesses are isolated points.  The
+blocker is a property of the problem, not of the search.
+
+The S2-loading invariant is the one lead that points somewhere: it suggests
+building candidates that maximally overload the middle stack, rather than
+sampling and hoping.
+
 ## Is the model even right?
 
 The bounds here are worthless if we are simulating the wrong machine. A model
