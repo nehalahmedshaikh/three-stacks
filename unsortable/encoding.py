@@ -370,3 +370,94 @@ def _model_to_ops(inst: Instance, model: Sequence[int]) -> tuple[int, ...]:
 
 def is_sortable(perm: Sequence[int], k: int = 3, mode: str = "reduced") -> bool:
     return solve(perm, k=k, mode=mode).sortable
+
+
+_WORKER_DECIDERS: dict = {}
+
+
+def worker_is_sortable(perm: Sequence[int], k: int = 3) -> bool:
+    """Process-local cached FixedLengthDecider, keyed by (length, k).
+
+    For use as the map function of a ProcessPoolExecutor: each worker builds
+    the shared CNF for a given length once and reuses it, so a fan-out over a
+    neighbourhood or a deletion scan pays the build cost once per worker
+    rather than once per permutation.
+    """
+    key = (len(perm), k)
+    d = _WORKER_DECIDERS.get(key)
+    if d is None:
+        d = _WORKER_DECIDERS[key] = FixedLengthDecider(len(perm), k=k)
+    return d.is_sortable(perm)
+
+
+class FixedLengthDecider:
+    """Decide many permutations of the *same* length, sharing one CNF.
+
+    Only one part of the encoding depends on the permutation.  Transitivity,
+    the non-crossing clauses, the per-element phase order and the output order
+    are all identical for every permutation of a given length -- the input
+    order (a) is the only thing that changes, and it is n-1 unit facts about
+    the ``t_1`` events.
+
+    So: build the formula once, then decide each permutation by solving under
+    those n-1 literals as **assumptions**.  Profiling one decision at n = 22
+    showed 46% of the time building the CNF in Python and 40% handing it to
+    the solver, against 14% actually solving.  This removes both for every
+    call after the first, and lets the solver carry learned clauses across
+    calls, which for closely related instances (a neighbourhood, a plateau
+    walk) is worth more than the constant factor.
+
+    Correctness is unchanged: asserting a unit clause and assuming the same
+    literal are equisatisfiable.  ``tests/test_encoding.py`` checks this class
+    against the one-shot path exhaustively.
+    """
+
+    def __init__(self, n: int, k: int = 3, solver_name: str = "cadical195"):
+        from pysat.formula import CNF
+        from pysat.solvers import Solver
+
+        self.n, self.k = n, k
+        b = _Builder(tuple(range(1, n + 1)), k, "full")
+        # every clause except the input order, which becomes assumptions
+        b._transitivity()
+        b._noncrossing()
+        for v in range(1, n + 1):
+            for p in range(k):
+                b.clauses.append([b.lit(b.ev(v, p), b.ev(v, p + 1))])
+        for v in range(1, n):
+            b.clauses.append([b.lit(b.ev(v, k), b.ev(v + 1, k))])
+        self._b = b
+        self.n_vars, self.n_clauses = b.n_vars, len(b.clauses)
+        self._solver = Solver(name=solver_name,
+                              bootstrap_with=CNF(from_clauses=b.clauses))
+        self.calls = 0
+
+    def _assumptions(self, perm: Sequence[int]) -> list[int]:
+        b = self._b
+        return [b.lit(b.ev(perm[i], 0), b.ev(perm[i + 1], 0))
+                for i in range(len(perm) - 1)]
+
+    def is_sortable(self, perm: Sequence[int]) -> bool:
+        p = check(perm)
+        if len(p) != self.n:
+            raise ValueError(f"expected length {self.n}, got {len(p)}")
+        self.calls += 1
+        return bool(self._solver.solve(assumptions=self._assumptions(p)))
+
+    def ops(self, perm: Sequence[int]) -> tuple[int, ...] | None:
+        """A replayable operation word, or None if unsortable."""
+        if not self.is_sortable(perm):
+            return None
+        inst = Instance(perm=check(perm), k=self.k, mode="full",
+                        n_events=self._b.N, n_vars=self._b.n_vars,
+                        clauses=self._b.clauses, var_of=self._b.var_of)
+        return _model_to_ops(inst, self._solver.get_model())
+
+    def close(self) -> None:
+        self._solver.delete()
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, *exc):
+        self.close()

@@ -72,3 +72,38 @@ def test_full_and_reduced_agree_on_n7_k2():
         a = encoding.solve(p, k=2, mode="full").sortable
         b = encoding.solve(p, k=2, mode="reduced").sortable
         assert a == b, p
+
+
+# --- the incremental fixed-length decider -----------------------------------
+# Only the input order depends on the permutation, so one CNF serves every
+# permutation of a given length with the input order passed as assumptions.
+# 18x faster on a neighbourhood probe; it must agree exactly.
+
+@pytest.mark.parametrize("k", [1, 2, 3])
+@pytest.mark.parametrize("n", [1, 2, 3, 4, 5, 6, 7])
+def test_fixed_length_decider_matches_brute_force(k, n):
+    from unsortable.encoding import FixedLengthDecider
+    with FixedLengthDecider(n, k=k) as d:
+        for p in perms.all_perms(n):
+            assert d.is_sortable(p) == brute_sortable(p, k=k), (p, k, n)
+
+
+@pytest.mark.parametrize("k", [1, 2, 3])
+@pytest.mark.parametrize("n", [6, 7])
+def test_fixed_length_decider_matches_one_shot(k, n):
+    from unsortable.encoding import FixedLengthDecider
+    with FixedLengthDecider(n, k=k) as d:
+        for p in perms.all_perms(n):
+            assert d.is_sortable(p) == encoding.solve(p, k=k, mode="reduced").sortable
+
+
+@pytest.mark.parametrize("k", [1, 2, 3])
+def test_fixed_length_decider_ops_replay(k):
+    from unsortable.encoding import FixedLengthDecider
+    with FixedLengthDecider(6, k=k) as d:
+        for p in perms.all_perms(6):
+            ops = d.ops(p)
+            if ops is None:
+                assert not brute_sortable(p, k=k)
+            else:
+                assert verify.sorts(list(p), ops, k=k), (p, k, ops)

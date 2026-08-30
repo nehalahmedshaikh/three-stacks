@@ -26,7 +26,8 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
-from unsortable.minimizer import _solve_one, delete_positions
+from unsortable.encoding import worker_is_sortable
+from unsortable.minimizer import delete_positions
 from unsortable.perms import Perm, from_string, to_string
 
 
@@ -67,8 +68,7 @@ def main(argv=None) -> int:
 
     t0 = time.time()
     with ProcessPoolExecutor(max_workers=a.workers) as ex:
-        verdicts = list(ex.map(_solve_one, [q for _, q in nbrs],
-                               [a.k] * len(nbrs), ["reduced"] * len(nbrs)))
+        verdicts = list(ex.map(worker_is_sortable, [q for _, q in nbrs], [a.k] * len(nbrs)))
         unsortable = [(why, q) for (why, q), s in zip(nbrs, verdicts) if not s]
         print(f"{len(unsortable)}/{len(nbrs)} neighbours are still unsortable "
               f"({len(unsortable)/len(nbrs):.2%})  [{time.time()-t0:.0f}s]\n",
@@ -77,8 +77,7 @@ def main(argv=None) -> int:
         shorter = []
         for why, q in unsortable:
             dels = [delete_positions(q, [i]) for i in range(len(q))]
-            ds = list(ex.map(_solve_one, dels, [a.k] * len(dels),
-                             ["reduced"] * len(dels)))
+            ds = list(ex.map(worker_is_sortable, dels, [a.k] * len(dels)))
             bad = [d for d, s in zip(dels, ds) if not s]
             tag = "BASIS" if not bad else f"NON-MINIMAL -> length {len(bad[0])}"
             print(f"  {why:<28} {to_string(q)}  [{tag}]", flush=True)
