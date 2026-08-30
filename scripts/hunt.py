@@ -185,7 +185,7 @@ def cmd_walk(a) -> int:
 
     pool = ProcessPoolExecutor(max_workers=a.workers) if a.workers > 1 else None
     scan = _Scanner(sat_decider(a.k), a.k, "reduced", a.workers, pool)
-    accepted = rejected = 0
+    accepted = rejected = harvested = 0
     t0 = time.time()
     try:
         for it in range(a.iterations):
@@ -197,15 +197,26 @@ def cmd_walk(a) -> int:
                 continue
             cur = hit[1]
             accepted += 1
-            record("walk", cur, a.k, False, {"iteration": it})
 
             # the payoff: is this one non-minimal?
             shorter = scan.first_unsortable(_single_points(cur, rng))
             if shorter is not None:
                 q = shorter[1]
                 print(f"\n*** LENGTH {len(q)} ***\n{to_string(q)}\n", flush=True)
-                record("walk-shorter", q, a.k, False, {"from": to_string(cur)})
-                return 0
+                record("walk-shorter", q, a.k, True, {"from": to_string(cur)})
+                if not a.harvest:
+                    return 0
+                cur = q          # carry on walking at the new, shorter length
+                L = len(q)
+                continue
+            # every deletion sorts, so this is a distinct basis element.
+            # Harvesting these is the point: structure cannot be inferred
+            # from the single length-22 witness we started with.
+            harvested += 1
+            record("walk-basis", cur, a.k, True, {"iteration": it})
+            if harvested % 5 == 0:
+                print(f"[{it}] harvested {harvested} basis elements at "
+                      f"length {L}  ({time.time()-t0:.0f}s)", flush=True)
             if accepted % 10 == 0:
                 rate = accepted / max(accepted + rejected, 1)
                 print(f"[{it}] {accepted} accepted, {rejected} rejected "
@@ -270,6 +281,8 @@ def main(argv=None) -> int:
     p = sub.add_parser("walk", parents=[common])
     p.add_argument("--perm", required=True, help="an unsortable starting permutation")
     p.add_argument("--iterations", type=int, default=100000)
+    p.add_argument("--harvest", action="store_true",
+                   help="keep walking after a shorter witness, collecting basis elements")
     p.add_argument("--batch", type=int, default=24,
                    help="neighbours proposed per step (evaluated in parallel)")
     p.set_defaults(fn=cmd_walk)
