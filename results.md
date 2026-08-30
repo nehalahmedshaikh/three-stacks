@@ -341,6 +341,66 @@ The S2-loading invariant is the one lead that points somewhere: it suggests
 building candidates that maximally overload the middle stack, rather than
 sampling and hoping.
 
+## Trying to construct instead of search
+
+The core analysis suggested building candidates that overload the middle
+stack rather than sampling and hoping.  It also gives a clean reformulation,
+which is worth stating because it makes the mechanism concrete.
+
+A stack can sort its input iff that input avoids 231, so S3 can finish iff
+the sequence *arriving* at it avoids 231.  Therefore
+
+    pi is 3-stack-sortable  <=>  some stack-rearrangement of pi
+                                 is 2-stack-sortable
+
+and since S1 can always pass elements straight through (push, pop
+immediately), pi itself is one of the sequences S2 might see:
+
+    every 3-stack-unsortable permutation is 2-stack-unsortable
+
+That second fact is a genuinely cheap filter -- k=2 calls are far faster --
+and it is used in `scripts/construct.py`.
+
+**Structured construction fails.**  Interleaved decreasing runs, riffles,
+affine maps, zigzags of several amplitudes, and inflations of the length-7
+two-stack obstruction, each with and without value 1 moved last, swept over
+lengths 14-24:
+
+| | per length |
+|---|---:|
+| candidates | 45-78 |
+| 2-stack-unsortable | 27-55 |
+| **3-stack-unsortable** | **0, at every length** |
+
+So these families comfortably defeat two stacks and never defeat three.  The
+third stack absorbs regularity: a periodic permutation gives the machine a
+repeating pattern it can answer with a repeating strategy.  Obstruction seems
+to require irreducibly aperiodic structure, which is the same thing the dense
+core was saying.
+
+**And a second gradient fails.**  Define `g(pi)` as the fraction of pi's
+stack-rearrangements that are 2-stack-sortable; pi is unsortable exactly when
+g = 0, so small g ought to mean close.  Sampling 300 rearrangements each:
+
+| | g |
+|---|---|
+| the length-22 witness | 0.000 |
+| 8 of its length-21 deletions | 0.000 all |
+| 8 random length-21 permutations | 0.000 (5 of 8), else 0.003-0.053 |
+
+The witness scores zero -- and so does most of the space.  There are ~10^10
+rearrangements at this length and the 2-stack-sortable ones are a vanishing
+fraction, so a 300-sample estimate saturates at zero almost everywhere.  Same
+failure as `f`.
+
+**The pattern across all of it.**  Every locally computable measure we have
+tried -- neighbourhood density, extension count `f`, rearrangement fraction
+`g` -- reads zero at the witness *and* almost everywhere else.  That is not
+three coincidences; it is the dense-core result seen three ways.  When
+unsortability is a global property with no short certificate, nothing local
+can point at it, and continuous relaxation has nothing to relax.  Going below
+22 needs an idea about the structure of the class, not a better search.
+
 ## Is the model even right?
 
 The bounds here are worthless if we are simulating the wrong machine. A model
