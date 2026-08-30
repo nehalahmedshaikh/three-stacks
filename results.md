@@ -264,6 +264,41 @@ the basis-element graph: every unsortable neighbour that is minimal becomes a
 new node, and any that is *non-minimal* immediately yields a witness one
 shorter. That is the current route, and it serves both goals at once.
 
+## The landscape has no gradient (a negative result)
+
+Every search here is blind, because sortability is a yes/no answer: at length
+21 everything we try is sortable and they all look identical. The obvious fix
+is to score permutations by *how nearly* unsortable they are. For a
+permutation `p` of length L define
+
+    f(p) = how many one-point extensions of p (length L+1) are unsortable
+
+which is positive exactly when `p` sits inside a length-(L+1) obstruction.
+It is affordable only because of `FixedLengthDecider` -- f costs (L+1)^2
+decisions, 484 at L = 21 -- and it has a second payoff: every unsortable
+extension it finds is a new length-22 basis element, and we have only one.
+
+Measured (`scripts/gradient.py`, 484 decisions per evaluation):
+
+| sample | f |
+|---|---|
+| the 22 one-point deletions of our length-22 witness | **1, every one of them** |
+| 12 same-length neighbours of one of those deletions | 0 |
+| 12 uniform random length-21 permutations | 0 |
+
+So f is not a gradient, it is a delta function. Each deletion has *exactly
+one* unsortable extension -- the witness we already had -- and everything
+around them scores zero. The witness is isolated not just under same-length
+moves (0 of 651 neighbours unsortable) but in the containment order too:
+nothing else of length 22 contains any of its deletions.
+
+That kills gradient-guided search at this length, and it is worth stating
+plainly rather than quietly dropping. It also sharpens the picture from the
+neighbourhood table above: the obstruction is a needle, and the space around
+it carries no signal pointing at it. Progress below 22 needs a *construction*
+-- a reason certain permutations must be unsortable -- rather than any search
+that has to be led there by local information.
+
 ## Is the model even right?
 
 The bounds here are worthless if we are simulating the wrong machine. A model
