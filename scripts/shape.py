@@ -9,11 +9,10 @@ Two questions, both testable:
 
 2. If they do share a shape, can it be *resampled* to a length we have never
    seen?  A witness of length 23 resampled to 21 is a concrete candidate, and
-   candidates are cheap to test.  This is the only route to a shorter witness
-   that does not depend on stumbling across one.
+   candidates are cheap to test.
 
-Also reports plain positional statistics: where the small values sit, where
-the large ones sit, and how sharply that is determined.
+Also reports positional statistics: where the small values sit, where the
+large ones sit, and how sharply that is determined.
 
     python scripts/shape.py --min-length 22 --max-length 26
     python scripts/shape.py --resample-to 21 --test

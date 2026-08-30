@@ -1,10 +1,10 @@
 """Consolidate every unsortable permutation found into one committed record.
 
-The search writes to results/witnesses.jsonl, which is a scratch log: it is
-append-only, full of intermediate descent steps, and gitignored.  This
-distils it into results/basis_elements.json -- one entry per *distinct basis
-element*, with its verification status -- so the repo carries a permanent
-record of everything found, not just the shortest.
+The search writes to results/witnesses.jsonl, an append-only scratch log full
+of intermediate descent steps, gitignored.  This distils it into
+results/basis_elements.json: one entry per distinct basis element with its
+verification status, so the repo carries a permanent record of everything
+found.
 
 Verification status per entry:
 

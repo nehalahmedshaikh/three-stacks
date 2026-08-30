@@ -9,12 +9,12 @@ L-1.  So: from a known witness, enumerate every same-length neighbour, keep
 the unsortable ones, and check each for non-minimality.
 
 *Structure.*  Every unsortable neighbour that turns out to be minimal is a
-new basis element.  Structure cannot be inferred from one example, and this
-is how the population grows.  The exhaustive neighbourhood of the length-23
-witness yielded four new ones in under three minutes.
+new basis element, and structure cannot be inferred from one example.  The
+exhaustive neighbourhood of the length-23 witness yielded four new ones in
+under three minutes.
 
 The frontier is explored oldest-first, so the population stays spread around
-the starting witness rather than drilling down one branch.  Everything found
+the starting witness instead of drilling down one branch.  Everything found
 is appended to results/witnesses.jsonl as it happens.
 
     python scripts/harvest.py --perm 6-11-4-... --k 3 --workers 12

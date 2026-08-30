@@ -15,21 +15,18 @@ S1 is pinned by the input order and S3 by the output order plus its
 monotonicity invariant; S2 is the buffer that has to turn what S1 emits into
 something 231-avoiding.  An obstruction is a permutation where it cannot.
 
-Two consequences worth building on:
+Two consequences:
 
 * **Necessary condition.** S1 can always pass elements straight through
   (push then immediately pop), so pi itself is one of the sequences S2 might
-  see.  Hence *every* 3-stack-unsortable permutation is 2-stack-unsortable.
-  Candidates that are 2-stack-sortable can be rejected for the price of a
-  much easier solver call, and that is a cheap filter.
-* **What to build.** We want permutations that are not merely
-  2-stack-unsortable but *robustly* so -- whose stack-rearrangements are
-  unsortable too.
+  see.  Hence every 3-stack-unsortable permutation is 2-stack-unsortable, and
+  2-stack-sortable candidates can be rejected with a much cheaper call.
+* **What to build.** Permutations that are *robustly* 2-stack-unsortable --
+  whose stack-rearrangements are unsortable too.
 
-The families below are the structured ways of stressing that buffer.  Each
-is swept over a range of lengths and the shortest unsortable member of each
-is reported, which is the number that matters: a family that produces one
-below 22 beats the current bound.
+The families below stress that buffer.  Each is swept over a range of lengths
+and the shortest unsortable member reported; a family producing one below 22
+beats the current bound.
 
     python scripts/construct.py --min-n 14 --max-n 24 --workers 12
 """

@@ -18,9 +18,8 @@ Two modes:
 ``mode="full"`` (default)
     A faithful, auditable CNF.  Unit clauses come only from the constraints
     themselves; all transitivity triples are emitted; the solver derives
-    everything else.  This is the mode to use for any claim that ships with a
-    DRAT certificate, because the certificate proves *this CNF* unsatisfiable
-    and nothing more.
+    everything else.  Use this for any claim shipping a DRAT certificate: the
+    certificate proves *this CNF* unsatisfiable and nothing more.
 
 ``mode="reduced"``
     The encoder first computes the transitive closure of the forced
@@ -28,10 +27,10 @@ Two modes:
     Much smaller and faster; used during the search.  Anything it flags is
     re-run in ``full`` mode before being claimed.
 
-Caveat worth stating plainly: a DRAT proof certifies that the CNF is
-unsatisfiable.  That the CNF *is* the sortability question is established by
-the proof in ``docs/notes.md`` and by exhaustive agreement with the
-brute-force simulator (``tests/test_encoding.py``), not by the certificate.
+A DRAT proof certifies that the CNF is unsatisfiable.  That the CNF *is* the
+sortability question is established by the proof in ``docs/notes.md`` and by
+exhaustive agreement with the brute-force simulator
+(``tests/test_encoding.py``).
 """
 
 from __future__ import annotations
@@ -404,12 +403,12 @@ class FixedLengthDecider:
     showed 46% of the time building the CNF in Python and 40% handing it to
     the solver, against 14% actually solving.  This removes both for every
     call after the first, and lets the solver carry learned clauses across
-    calls, which for closely related instances (a neighbourhood, a plateau
-    walk) is worth more than the constant factor.
+    closely related instances -- a neighbourhood, a plateau walk -- which is
+    the larger win.
 
-    Correctness is unchanged: asserting a unit clause and assuming the same
-    literal are equisatisfiable.  ``tests/test_encoding.py`` checks this class
-    against the one-shot path exhaustively.
+    Asserting a unit clause and assuming the same literal are
+    equisatisfiable, so correctness is unchanged; ``tests/test_encoding.py``
+    checks this class against the one-shot path exhaustively.
     """
 
     def __init__(self, n: int, k: int = 3, solver_name: str = "cadical195"):

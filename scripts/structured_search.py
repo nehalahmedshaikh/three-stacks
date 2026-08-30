@@ -9,15 +9,14 @@ The basis elements are not uniform permutations.  Measured over 25 of them
   * alternation is 0.81-0.90 against 0.67 for a uniform permutation --
     they are strongly zigzag
 
-If that profile is *causal* rather than incidental, sampling from it should
-turn up unsortable permutations at a higher rate than sampling uniformly.
-That is a measurable claim, and this script measures it: same length, same
-budget, three distributions, count the unsortable ones.
+If that profile is causal, sampling from it should turn up unsortable
+permutations at a higher rate than sampling uniformly.  This measures it:
+same length, same budget, three distributions, count the unsortable ones.
 
-Uniform sampling finds nothing below length ~38, so the comparison is run at
-a length where the uniform rate is non-zero and a ratio is meaningful.  If
-the structured rate is much higher there, the same bias is worth pointing at
-lengths 20-21 where uniform sampling is hopeless.
+Uniform sampling finds nothing below length ~38, so the comparison runs at a
+length where the uniform rate is non-zero and a ratio is meaningful.  A much
+higher structured rate there justifies pointing the same bias at lengths
+20-21, where uniform sampling is hopeless.
 
     python scripts/structured_search.py --compare-at 38 --trials 120
     python scripts/structured_search.py --hunt-at 21 --trials 4000

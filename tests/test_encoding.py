@@ -77,7 +77,7 @@ def test_full_and_reduced_agree_on_n7_k2():
 # --- the incremental fixed-length decider -----------------------------------
 # Only the input order depends on the permutation, so one CNF serves every
 # permutation of a given length with the input order passed as assumptions.
-# 18x faster on a neighbourhood probe; it must agree exactly.
+# 18x faster on a neighbourhood probe, and it must agree exactly.
 
 @pytest.mark.parametrize("k", [1, 2, 3])
 @pytest.mark.parametrize("n", [1, 2, 3, 4, 5, 6, 7])

@@ -89,9 +89,8 @@ Nothing else can go wrong: `t_1[v] < t_2[v] < t_3[v] < t_4[v]` guarantees
 each element performs its four operations in order, and distinctness makes
 the total order well defined. ∎
 
-**Only the relative order of the `4n` events matters**, which is why the SAT
-encoding uses pairwise `before` variables plus transitivity rather than
-absolute time slots.
+**Only the relative order of the `4n` events matters**, so the SAT encoding
+uses pairwise `before` variables plus transitivity.
 
 ### Hand check on `231`, one stack
 
@@ -120,9 +119,8 @@ that run:
 (b) `t_3[1]=6 < t_3[2]=8 < t_3[3]=9`. ✓
 (c) `S1` intervals `2:[1,7]`, `3:[2,3]`, `1:[4,5]` — the last two are nested
 inside the first and disjoint from each other. `S2` intervals `3:[3,9]`,
-`1:[5,6]`, `2:[7,8]` — likewise. No crossings. ✓
-
-The extra stack buys exactly the room to nest what one stack had to cross.
+`1:[5,6]`, `2:[7,8]` — likewise. No crossings. ✓ The extra stack buys the room to nest what one stack had to
+cross.
 
 ## 4. Downward closure
 
@@ -146,13 +144,10 @@ order. They are all legal:
 * The output is the original output with `v` deleted, i.e. increasing.
   Standardising gives the identity. ∎
 
-This is why `minimise` is sound: it only ever needs to check that the
-shrunken permutation is *still unsortable*, and the search can be restricted
-to basis elements.
-
-`tests/test_closure.py` checks the claim exhaustively for `k = 1, 2` at
-`n <= 8` (where unsortable permutations exist and the statement has teeth)
-and on sampled long permutations for `k = 3`.
+`minimise` is sound because of this: it need only check that the shrunken
+permutation is still unsortable. `tests/test_closure.py` checks the claim
+exhaustively for `k = 1, 2` at `n <= 8`, where unsortable permutations exist
+and the statement has teeth, and on sampled long permutations for `k = 3`.
 
 **Symmetries.** None of reverse, complement, inverse, or reverse-complement
 is assumed to preserve sortability. For `k = 1` none of them does: `231` is

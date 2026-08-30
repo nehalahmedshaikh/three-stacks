@@ -41,10 +41,8 @@ Sorting*, [arXiv:2602.16355v2](https://arxiv.org/abs/2602.16355) (24 August
 2026). That survey states that **no explicit unsortable permutation for three
 stacks is presented anywhere** -- not Tarjan's, not Murphy's, not Atkinson's
 38. As far as we can tell the permutations here are the first explicit,
-independently checkable witnesses of any length.
-
-So the answer lies in **[14, 22]** -- exactly Waton's guess of 22, and 7 above
-Elder's 15.
+independently checkable witnesses of any length. So the answer lies in
+**[14, 22]** -- exactly Waton's guess of 22, and 7 above Elder's 15.
 
 ### Murphy's conjecture, precisely
 
@@ -151,10 +149,9 @@ Once n! > B_k(n) an unsortable permutation must exist. Exact crossovers:
 | 3 | **642** | in [14, 22] |
 | 4 | 8,383 | unknown |
 
-Rigorous and search-free, but weak for k >= 2 -- it is 7x the truth at k = 2.
-Worth stating because it holds even if every search fails. (The original plan
-guessed the k = 3 crossover would land near 100; the real value is 642,
-because B_3(n) ~ 256^n and n! only overtakes that around n ~ e*256.)
+Rigorous and search-free, but weak for k >= 2 -- 7x the truth at k = 2. It
+holds even if every search fails. B_3(n) ~ 256^n, so n! only overtakes it
+around n ~ e*256.
 
 ## What the basis elements look like
 
@@ -168,7 +165,7 @@ because B_3(n) ~ 256^n and n! only overtakes that around n ~ e*256.)
   moment it arrives every other value is already distributed across the three
   stacks, and every one of them must leave *after* `1` -- in whatever LIFO
   order it happens to be frozen in. Putting `1` last maximises the pressure
-  on the machine, and the search discovered this without being told.
+  on the machine.
 * **Inversion density runs below random**, 0.41-0.48 against ~0.50, and the
   shorter witnesses have the lower densities. Shorter basis elements look
   less random, which suggests the short ones live in a structured corner of
@@ -178,7 +175,7 @@ because B_3(n) ~ 256^n and n! only overtakes that around n ~ e*256.)
 * Every length-4 pattern occurs in every basis element, so whatever
   avoidance structure exists lives at larger patterns.
 
-### The witnesses have a measurable shape, and it is causal
+### The shape is causal
 
 Over 25 basis elements of lengths 22-29 (`scripts/shape.py`):
 
@@ -190,11 +187,8 @@ Over 25 basis elements of lengths 22-29 (`scripts/shape.py`):
 | alternation (zigzag rate) | 0.81-0.90 | 0.67 |
 
 They are strongly **zigzag** permutations that open about a quarter of the
-way up the value range and end on 1.
-
-This is not just a description of what the search happened to find -- it is
-*causal*, and the cheapest way to show that is to sample from the profile and
-count. At length 36, 150 samples each (`scripts/structured_search.py`):
+way up the value range and end on 1. Sampling from that profile and counting,
+at length 36, 150 samples each (`scripts/structured_search.py`):
 
 | distribution | unsortable |
 |---|---:|
@@ -202,14 +196,11 @@ count. At length 36, 150 samples each (`scripts/structured_search.py`):
 | value 1 forced last | 37 / 150 (24.7%) |
 | zigzag + value 1 last | **100 / 150 (66.7%)** |
 
-A 25x improvement in hit rate. Since a witness certifies itself, a biased
-search costs nothing in rigour -- which is why `hunt.py random --structured`
-now draws its starting points from this profile instead of uniformly.
-
-What does *not* work is naive extrapolation across lengths: resampling all 25
-basis elements down to length 21 (preserving the normalised shape) gives 25
-candidates, and every one of them sorts. The shape is a strong prior, not a
-formula.
+A 25x improvement in hit rate. A witness certifies itself, so a biased search
+costs nothing in rigour; `hunt.py random --structured` draws its starting
+points from this profile. Extrapolation across lengths fails: resampling all
+25 basis elements to length 21 preserving the normalised shape gives 25
+candidates, and every one sorts. The shape is a prior, not a formula.
 
 ### Structured families are all sortable
 
@@ -219,19 +210,15 @@ permutations with uniform layers, at every length up to 60: **all sortable**
 unsortable essentially always (9/9 in the sweep above), yet every structured
 family member sorts.
 
-So unsortability here is not built by stacking local obstructions -- it
-requires genuine disorder. That is why the plan's first route (structured
-families) yields nothing, and why descending from long random witnesses was
-the approach that worked. Combined with the inversion-density observation
-above, the short basis elements appear to sit in a narrow band: too ordered
-and three stacks cope easily, too disordered and the witness is long.
+Unsortability here requires genuine disorder, which is why descending from
+long random witnesses worked. With the inversion-density observation above,
+the short basis elements appear to sit in a narrow band: too ordered and
+three stacks cope easily, too disordered and the witness is long.
 
 ## Why the search stops at 22
 
 The bound fell 24 -> 23 in 78 hopping iterations and 23 -> 22 in 149, then sat
-at 22 for several thousand. That is a different regime, and it is measurable.
-
-Take a witness and decide **every** same-length neighbour -- all
+at 22 for several thousand. Take a witness and decide **every** same-length neighbour -- all
 transpositions, all single-point relocations, all adjacent-value swaps. For
 n = 22 that is 651 permutations, about two minutes across cores:
 
@@ -243,40 +230,36 @@ n = 22 that is 651 permutations, about two minutes across cores:
 | k=3, n=23 | 4 / 715 (0.56%) | exhaustive |
 | k=3, n=22 | **0 / 651 (0%)** | exhaustive |
 
-So the length-22 witness is an isolated point: not one of its 651 neighbours
-is unsortable. That is why basin hopping stalled and why a same-length walk
-is useless there -- there is nowhere to step. It also explains why hopping
-worked at all: it never moves sideways at the target length, it descends from
-lengths where the unsortable set is still fat.
+The length-22 witness is an isolated point: not one of its 651 neighbours is
+unsortable, so basin hopping stalls and a same-length walk has nowhere to
+step. Hopping worked at all only because it never moves sideways at the
+target length -- it descends from lengths where the unsortable set is fat.
 
-**This is not evidence that 22 is the answer.** The k=2 row is the control
-that rules that inference out: at the *known* minimum for two stacks the
-neighbourhood is not empty either, and a walk started one above it drops to
-length 7 immediately. Isolation measures how hard the witness is to move
-away from, not how close the bound is to the truth. The answer remains
-anywhere in [14, 22].
+**This is not evidence that 22 is the answer.** The k=2 row is the control:
+at the known minimum for two stacks the neighbourhood is non-empty, and a
+walk started one above it drops to length 7 immediately. Isolation measures
+how hard a witness is to move away from. The answer remains anywhere in
+[14, 22].
 
-What the enumeration is good for is **population**. The exhaustive
-neighbourhood of the length-23 witness turned up four new length-23 basis
-elements in under three minutes -- and structure cannot be inferred from a
-single example. `scripts/harvest.py` runs this as a breadth-first search over
-the basis-element graph: every unsortable neighbour that is minimal becomes a
-new node, and any that is *non-minimal* immediately yields a witness one
-shorter. That is the current route, and it serves both goals at once.
+The enumeration is useful for **population**: the exhaustive neighbourhood of
+the length-23 witness turned up four new length-23 basis elements in under
+three minutes. `scripts/harvest.py` runs it as a breadth-first search over the
+basis-element graph, where every minimal unsortable neighbour becomes a new
+node and every non-minimal one yields a witness one shorter.
 
-## The landscape has no gradient (a negative result)
+## The landscape has no gradient
 
-Every search here is blind, because sortability is a yes/no answer: at length
-21 everything we try is sortable and they all look identical. The obvious fix
-is to score permutations by *how nearly* unsortable they are. For a
-permutation `p` of length L define
+Sortability is a yes/no answer, so at length 21 everything we try is sortable
+and looks identical to a search. Scoring permutations by *how nearly*
+unsortable they are is the obvious fix. For a permutation `p` of length L
+define
 
     f(p) = how many one-point extensions of p (length L+1) are unsortable
 
-which is positive exactly when `p` sits inside a length-(L+1) obstruction.
-It is affordable only because of `FixedLengthDecider` -- f costs (L+1)^2
-decisions, 484 at L = 21 -- and it has a second payoff: every unsortable
-extension it finds is a new length-22 basis element, and we have only one.
+which is positive exactly when `p` sits inside a length-(L+1) obstruction. f
+costs (L+1)^2 decisions, 484 at L = 21, so it is affordable only via
+`FixedLengthDecider`; every unsortable extension it finds is also a new
+length-22 basis element, and we have only one.
 
 Measured (`scripts/gradient.py`, 484 decisions per evaluation):
 
@@ -286,18 +269,13 @@ Measured (`scripts/gradient.py`, 484 decisions per evaluation):
 | 12 same-length neighbours of one of those deletions | 0 |
 | 12 uniform random length-21 permutations | 0 |
 
-So f is not a gradient, it is a delta function. Each deletion has *exactly
-one* unsortable extension -- the witness we already had -- and everything
-around them scores zero. The witness is isolated not just under same-length
-moves (0 of 651 neighbours unsortable) but in the containment order too:
-nothing else of length 22 contains any of its deletions.
-
-That kills gradient-guided search at this length, and it is worth stating
-plainly rather than quietly dropping. It also sharpens the picture from the
-neighbourhood table above: the obstruction is a needle, and the space around
-it carries no signal pointing at it. Progress below 22 needs a *construction*
--- a reason certain permutations must be unsortable -- rather than any search
-that has to be led there by local information.
+f is a delta function. Each deletion has exactly one unsortable extension --
+the witness we already had -- and everything around them scores zero. The
+witness is isolated under same-length moves (0 of 651 neighbours) and in the
+containment order: nothing else of length 22 contains any of its deletions.
+Gradient-guided search is dead at this length. The obstruction is a needle and
+the space around it carries no signal pointing at it, so progress below 22
+needs a *construction* -- a reason certain permutations must be unsortable.
 
 ## What the refutation actually says
 
@@ -316,36 +294,26 @@ encode says *why* a permutation is unsortable.  Two independent witnesses
 | non-crossing on **S2** | **317** | **380** |
 | non-crossing on S3 | 190 | 234 |
 
-Three things fall out, and they agree across both:
+Three things fall out, agreeing across both:
 
-* **Every input and output constraint is needed.** Not a single one is
-  dispensable, which is what being a basis element looks like at the level
-  of the proof rather than by definition.
+* **Every input and output constraint is needed.** Being a basis element,
+  visible in the proof.
 * **S1 and S3 carry near-identical load, and the middle stack carries about
-  1.65x either** (317 vs 189, 380 vs 234).  That is a sharp invariant.  It
-  has a natural reading: S1 is pinned by the input order and S3 by the output
-  order plus its monotonicity invariant, so S2 is the free buffer that has to
-  absorb the mismatch -- and the obstruction is precisely that it cannot.
-* **The core is dense, not local.** 2.8% of the clauses, but spread over
-  every value and every ordering constraint.  There is no small gadget
-  driving the contradiction.
+  1.65x either** (317 vs 189, 380 vs 234). S1 is pinned by the input order
+  and S3 by the output order plus its monotonicity invariant, so S2 is the
+  free buffer that has to absorb the mismatch, and the obstruction is that
+  it cannot.
+* **The core is dense.** 2.8% of the clauses, spread over every value and
+  every ordering constraint, with no small gadget driving the contradiction.
 
-That last point is the explanation for the wall.  Unsortability here is a
-global property of all the interleavings at once, not something a short
-sub-pattern certifies -- which is exactly why local search finds no gradient
+The last point explains the wall. Unsortability here is a global property of
+all the interleavings at once, which is why local search finds no gradient
 (f = 0 off the witness), why no pruning is available (there is no short
-obstruction to prune with), and why the witnesses are isolated points.  The
-blocker is a property of the problem, not of the search.
-
-The S2-loading invariant is the one lead that points somewhere: it suggests
-building candidates that maximally overload the middle stack, rather than
-sampling and hoping.
+obstruction to prune with), and why the witnesses are isolated points. The
+S2-loading invariant is the one lead that points anywhere: build candidates
+that maximally overload the middle stack.
 
 ## Trying to construct instead of search
-
-The core analysis suggested building candidates that overload the middle
-stack rather than sampling and hoping.  It also gives a clean reformulation,
-which is worth stating because it makes the mechanism concrete.
 
 A stack can sort its input iff that input avoids 231, so S3 can finish iff
 the sequence *arriving* at it avoids 231.  Therefore
@@ -358,8 +326,8 @@ immediately), pi itself is one of the sequences S2 might see:
 
     every 3-stack-unsortable permutation is 2-stack-unsortable
 
-That second fact is a genuinely cheap filter -- k=2 calls are far faster --
-and it is used in `scripts/construct.py`.
+k=2 calls are far faster, so that is a cheap filter, used in
+`scripts/construct.py`.
 
 **Structured construction fails.**  Interleaved decreasing runs, riffles,
 affine maps, zigzags of several amplitudes, and inflations of the length-7
@@ -372,11 +340,11 @@ lengths 14-24:
 | 2-stack-unsortable | 27-55 |
 | **3-stack-unsortable** | **0, at every length** |
 
-So these families comfortably defeat two stacks and never defeat three.  The
+These families comfortably defeat two stacks and never defeat three. The
 third stack absorbs regularity: a periodic permutation gives the machine a
-repeating pattern it can answer with a repeating strategy.  Obstruction seems
-to require irreducibly aperiodic structure, which is the same thing the dense
-core was saying.
+repeating pattern it can answer with a repeating strategy. Obstruction seems
+to require irreducibly aperiodic structure, which is what the dense core also
+says.
 
 **And a second gradient fails.**  Define `g(pi)` as the fraction of pi's
 stack-rearrangements that are 2-stack-sortable; pi is unsortable exactly when
@@ -393,24 +361,22 @@ rearrangements at this length and the 2-stack-sortable ones are a vanishing
 fraction, so a 300-sample estimate saturates at zero almost everywhere.  Same
 failure as `f`.
 
-**The pattern across all of it.**  Every locally computable measure we have
-tried -- neighbourhood density, extension count `f`, rearrangement fraction
-`g` -- reads zero at the witness *and* almost everywhere else.  That is not
-three coincidences; it is the dense-core result seen three ways.  When
-unsortability is a global property with no short certificate, nothing local
-can point at it, and continuous relaxation has nothing to relax.  Going below
-22 needs an idea about the structure of the class, not a better search.
+**The pattern across all of it.** Every locally computable measure tried --
+neighbourhood density, extension count `f`, rearrangement fraction `g` --
+reads zero at the witness and almost everywhere else. That is the dense-core
+result seen three ways: when unsortability is a global property with no short
+certificate, nothing local can point at it and continuous relaxation has
+nothing to relax. Going below 22 needs an idea about the structure of the
+class.
 
 ## Is the model even right?
 
 The bounds here are worthless if we are simulating the wrong machine. A model
 *more restrictive* than "three stacks in series" would call permutations
-unsortable that really are sortable, and every number above would be too
-small. This is the one failure mode that no amount of solver verification
-catches, because the solver would be faithfully answering the wrong question.
-
-The literature supplies sharp, falsifiable predictions at three different
-points, and the model hits all of them:
+unsortable that really are sortable, and no amount of solver verification
+catches it -- the solver would be faithfully answering the wrong question.
+The literature supplies sharp, falsifiable predictions at three points, and
+the model hits all of them:
 
 | prediction | source | what we get |
 |---|---|---|
@@ -418,47 +384,44 @@ points, and the model hits all of them:
 | 2 stacks in series first fail at length **7** | Tarjan | exactly 7 -- not 6 (too restrictive), not 8 (too permissive) |
 | every permutation of length <= 13 is 3-stack-sortable | Atkinson | **exhaustive** at n = 10 (all 3,628,800 sortable); 800 random permutations at n = 12 and n = 13: **zero** unsortable |
 
-That last row is the direct test. The exhaustive half (`scripts/count_sortable.py`)
-leaves no room at n = 10 at all; the sampled half (`scripts/validate_model.py`)
-reaches to the very top of the known-sortable range. If our machine were even
-slightly too restrictive, this is exactly where it would show, and it does not. Every one of
-those 800 sortable verdicts also came with an operation word that was
-*replayed* on the independent simulator in `verify.py` and really did sort --
-so the SAT solver is not merely saying "satisfiable", it is producing runs
-that work.
+The last row is the direct test. The exhaustive half
+(`scripts/count_sortable.py`) leaves no room at n = 10; the sampled half
+(`scripts/validate_model.py`) reaches the top of the known-sortable range,
+which is where a too-restrictive machine would show. Each of those 800
+sortable verdicts also carried an operation word that was *replayed* on the
+independent simulator in `verify.py` and did sort, so the solver is producing
+runs that work.
 
-A model error would have to be wrong in a way that simultaneously reproduces
-Catalan numbers at k = 1, lands exactly on 7 at k = 2, and leaves everything
-below 14 sortable at k = 3. The remaining honest gap is that all three checks
-live at n <= 13, and the witnesses are at n = 22. The encoding has no
-size-dependent logic -- clause generation is uniform in n -- so there is no
-natural mechanism for it to become wrong only above 13, but it is not
-something the checks above rule out.
+A model error would have to reproduce Catalan numbers at k = 1, land exactly
+on 7 at k = 2, and leave everything below 14 sortable at k = 3
+simultaneously. The remaining gap: all three checks live at n <= 13 and the
+witnesses are at n = 22. Clause generation is uniform in n, so there is no
+mechanism for the encoding to become wrong only above 13, though the checks
+do not rule it out.
 
-## Negative results worth recording
+## Negative results
 
 * **No symmetry is available.** None of reverse, complement, inverse, or
   reverse-complement preserves sortability, for one stack or for two --
   measured exhaustively to n = 7. For k = 1: `231` is unsortable while its
   reverse `132`, complement `213`, inverse `312` and reverse-complement `312`
-  all sort. So no symmetry reduction is sound and none is used.
+  all sort. No symmetry reduction is sound, and none is used.
 * **Downward closure holds**, as it must -- verified exhaustively for
   k = 1, 2, 3 at n <= 7, and proved in [docs/notes.md](docs/notes.md) §4. The
   entire minimiser rests on it.
 * **Deleting more than one point from a basis element is provably useless.**
   Any multi-point deletion is a one-point deletion of an already-sortable
   one-point deletion, so downward closure makes it sortable. The only route
-  to a shorter witness is a *different* basis element. This is why the
-  minimiser has no "deep" mode and why basin hopping is the search.
+  to a shorter witness is a *different* basis element, which is why the
+  minimiser has no "deep" mode and basin hopping is the search.
 * **PySAT's in-memory proof capture truncates.** For the length-33 witness it
   returned 15 MB of a proof lingeling reported writing as 6.1 MB, and
   drat-trim rejected it ("conflict claimed, but not detected") on an instance
   that is genuinely unsatisfiable. Different solvers failed on different
-  instances, which is the signature of lossy capture rather than a wrong
-  answer. All certificates are now produced by a solver **binary writing DRAT
-  straight to a file**. A truncated proof that still verifies is sound --
-  drat-trim checks every step -- but one that fails is indistinguishable from
-  a wrong answer, which defeats the point of a certificate.
+  instances, which is the signature of lossy capture. All certificates are
+  now produced by a solver **binary writing DRAT straight to a file**. A
+  truncated proof that still verifies is sound -- drat-trim checks every step
+  -- but one that fails is indistinguishable from a wrong answer.
 
 ## Verification
 
@@ -490,10 +453,10 @@ python verify.py claims results/claims.json        # replay every SAT claim
 ### What the certificate does not say
 
 drat-trim proves *the CNF is unsatisfiable*. That the CNF asks the
-sortability question is a separate matter, established by the proof in
+sortability question is established separately, by the proof in
 docs/notes.md §3 and by exhaustive agreement with brute force. A reader who
 distrusts the encoding should check that proof; a reader who distrusts the
-solver should run drat-trim. The two are independent, deliberately.
+solver should run drat-trim. The two checks are independent.
 
 The brute-force simulator cannot reach n = 22, so at that size the simulator
 leg is absent and the encoding's correctness is carried by its agreement at

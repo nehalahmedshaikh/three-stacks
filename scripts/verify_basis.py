@@ -1,8 +1,8 @@
 """Certify that a permutation is a BASIS ELEMENT of the k-stack-sortable class.
 
-That is the object the open problem actually asks about: a permutation that
-is unsortable, every one-point deletion of which is sortable.  The claim
-splits into n+1 independently checkable pieces:
+A basis element is what the open problem asks about: a permutation that is
+unsortable, every one-point deletion of which is sortable.  The claim splits
+into n+1 independently checkable pieces:
 
   * the permutation itself is UNSORTABLE
         -> DIMACS + DRAT certificate, checked by drat-trim (third party)
@@ -10,8 +10,8 @@ splits into n+1 independently checkable pieces:
         -> an explicit operation word, replayed by verify.py (no solver
            trust needed at all -- you just run the machine)
 
-The second half is the nice part: n positive claims that a sceptic can check
-with a twenty-line simulator, no SAT solver involved.
+The second half is n positive claims a sceptic can check with a twenty-line
+simulator, no SAT solver involved.
 
     python scripts/verify_basis.py --perm 6-15-2-17-... --k 3
 """

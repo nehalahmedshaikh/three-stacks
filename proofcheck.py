@@ -1,10 +1,9 @@
 #!/usr/bin/env python3
 """Run drat-trim over every UNSAT claim in results/claims.json.
 
-Like verify.py this is deliberately standalone: it imports nothing from the
-``unsortable`` package.  All it does is hand the DIMACS file and the DRAT
-certificate to drat-trim -- a checker written by someone else -- and report
-the verdict.
+Standalone, like verify.py: imports nothing from the ``unsortable`` package.
+It hands the DIMACS file and the DRAT certificate to drat-trim -- a checker
+written by someone else -- and reports the verdict.
 
 drat-trim is not bundled.  Point this script at a binary with either
 

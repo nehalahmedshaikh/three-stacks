@@ -1,10 +1,9 @@
 #!/usr/bin/env python3
 """Independent checker for three-stacks claims.
 
-This file is deliberately standalone: it imports nothing from the
-``unsortable`` package and was written directly from the operational
-definition of the machine, so that a bug shared with the solver or the
-search code cannot hide here.
+Standalone: imports nothing from the ``unsortable`` package, written directly
+from the operational definition of the machine, so a bug shared with the
+solver or the search code cannot hide here.
 
     input -> S1 -> S2 -> ... -> Sk -> output
 

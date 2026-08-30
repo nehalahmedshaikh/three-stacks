@@ -14,9 +14,8 @@ A permutation is *k-stack-sortable in series* if some legal operation
 sequence leaves the identity in the output.  Every sorting run performs
 exactly (k+1)*n operations.
 
-Two prunings are used.  Both are proved in ``docs/notes.md`` and both are
-regression-tested against the unpruned search (``prune=False``) in
-``tests/test_simulator.py``:
+Two prunings are used, both proved in ``docs/notes.md`` and regression-tested
+against the unpruned search (``prune=False``) in ``tests/test_simulator.py``:
 
 P1 (last-stack monotonicity)
     S_k must be strictly increasing from top to bottom at all times, since

@@ -1,9 +1,8 @@
 """The prose must agree with the data.
 
-The headline number lives in three places -- README.md, results.md, and
-results/claims.json -- and they drifted apart twice while the bound was
-coming down (24 -> 23 -> 22).  These tests make that a build failure rather
-than something a reader notices.
+The headline number lives in README.md, results.md and results/claims.json,
+which drifted apart twice while the bound was coming down (24 -> 23 -> 22).
+These tests make that a build failure.
 """
 
 from __future__ import annotations

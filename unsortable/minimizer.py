@@ -10,17 +10,16 @@ unsortable witness can be shrunk towards one by deleting points.
 one-point deletions are sortable.  That is a *locally* minimal witness -- a
 genuine basis element -- not necessarily the globally shortest one.
 
-Ordering matters a lot in practice.  Delta-debugging's largest-bite-first
-heuristic is exactly wrong here: deleting a big block usually destroys the
-obstruction, so those calls almost always fail, and they are the *expensive*
-ones because the candidate is still long.  Single-point deletions succeed
-often and shrink the instance immediately, which makes every later call
-cheaper.  So the descent is single-point-first, in randomised order.
+Ordering matters.  Delta-debugging's largest-bite-first heuristic is wrong
+here: deleting a big block usually destroys the obstruction, so those calls
+almost always fail, and they are the expensive ones because the candidate is
+still long.  Single-point deletions succeed often and shrink the instance
+immediately, making every later call cheaper.  The descent is therefore
+single-point-first, in randomised order.
 
-Most of the work is the *failed* candidates in each scan, and they are
-independent, so the scan parallelises across cores almost perfectly
-(``workers``).  As soon as one candidate comes back unsortable the rest of
-the wave is cancelled.
+Most of the work is the failed candidates in each scan.  They are
+independent, so the scan parallelises across cores (``workers``); as soon as
+one candidate comes back unsortable the rest of the wave is cancelled.
 
 Once no single point can be removed the permutation is a basis element and
 the job is done -- and it is done in a strong sense.  Deleting *more* points

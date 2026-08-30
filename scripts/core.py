@@ -1,17 +1,10 @@
 """Ask the solver *why* a permutation is unsortable.
 
-We have DRAT refutations, but a refutation is a proof, not an explanation.
-drat-trim's ``-c`` flag emits the **unsatisfiable core**: the subset of the
-original clauses that actually participate in the contradiction.  Mapping
-those clauses back to the constraints they encode says which stack, which
-values, and which occupancy intervals are jointly impossible.
-
-That matters because the search is stuck for a structural reason.  Local
-methods have no gradient (f = 0 everywhere off the witness) and there is no
-short obstruction to prune with, so the only way below the current bound is
-to understand *why* one witness works and build another.  This is the
-cheapest available route to that: the solver already found the reason, it
-just prints it as 5 MB of resolution steps.
+A refutation is a proof, not an explanation.  drat-trim's ``-c`` flag emits
+the **unsatisfiable core**: the subset of the original clauses that
+participate in the contradiction.  Mapping those clauses back to the
+constraints they encode says which stack, which values, and which occupancy
+intervals are jointly impossible.
 
 Reported per core clause:
 
@@ -21,9 +14,8 @@ Reported per core clause:
   non-crossing     on stack s, values v and w may not cross
   transitivity     ordering consistency among three events
 
-The interesting rows are the non-crossing ones: those are the LIFO
-obstructions, and which pairs appear -- and how often each value appears --
-is the shape of the contradiction.
+The non-crossing rows are the LIFO obstructions; which pairs appear, and how
+often each value appears, is the shape of the contradiction.
 
     python scripts/core.py --perm 6-14-2-... --k 3
 """

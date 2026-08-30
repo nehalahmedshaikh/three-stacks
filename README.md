@@ -7,22 +7,14 @@ machine-checkable proof.**
 6-14-2-10-4-18-7-12-3-20-15-9-5-19-13-22-8-17-11-21-16-1
 ```
 
-The previous record was 38 (Atkinson, 1992), and it had stood for over thirty
-years. No explicit witness had ever been published, at any length — not
-Tarjan's claimed 41, not Murphy's 39, not Atkinson's 38. This one comes with
-a DRAT certificate that anyone can check with someone else's checker.
+The previous record was 38 (Atkinson, 1992), unbeaten for over thirty years,
+and no explicit witness had ever been published at any length. This one ships
+with a DRAT certificate anyone can check with someone else's checker.
 
-It is also a **basis element**: unsortable, but every one of its 22 one-point
-deletions *is* sortable, each with an explicit operation word you can replay
-by hand. So the shortest permutation three stacks cannot sort has length
-somewhere in **[14, 22]** — exactly Waton's guess.
-
-Along the way this refutes **Murphy's conjecture** that t stacks in series
-sort everything up to length (t+1)! — which for t = 3 predicts that every
-permutation of length ≤ 24 is sortable, and that the answer is 25. The
-witness above has length 22, well inside the range the conjecture claims is
-entirely sortable. (A separately certified length-24 basis element sits
-exactly on the boundary.)
+It is a **basis element**: unsortable, but every one of its 22 one-point
+deletions *is* sortable, each with an operation word you can replay by hand.
+So the answer lies in **[14, 22]** — exactly Waton's guess — and Murphy's
+conjecture of 25 is refuted.
 
 Full numbers, provenance, and caveats: **[results.md](results.md)**.
 
@@ -58,9 +50,8 @@ guessed 22).
 ![a sorting run](docs/img/51742638-k3.svg)
 
 *Each bar is one value occupying one stack, over time. Sortability is exactly
-the claim that all three lanes can be drawn with no two bars crossing — that
-is the encoding, see below.* Interactive version:
-[`docs/visualiser.html`](docs/visualiser.html).
+the claim that all three lanes can be drawn with no two bars crossing.*
+Interactive version: [`docs/visualiser.html`](docs/visualiser.html).
 
 ## Why it moved now
 
@@ -87,13 +78,12 @@ unsortable about a third of the time and decide in seconds. Finding *a*
 witness is easy; the work is shrinking it.
 
 **3. Basin hopping does the shrinking.** Greedy deletion stalls on whatever
-basis element it happens to reach (33, then 29). But unsortability is closed
-*upward*, so inserting points into a witness keeps it a witness — for free,
-with no search. Perturb up, descend again on a fresh random path, keep the
-best. Accepting *equal-length* results as the new starting point matters as
-much as the perturbation: without it the walk keeps re-perturbing one
-permutation and never drifts, and the run sat at 24 for over a hundred
-iterations before that change went in.
+basis element it happens to reach (33, then 29). Unsortability is closed
+*upward*, so inserting points into a witness keeps it a witness, for free.
+Perturb up, descend again on a fresh random path, keep the best. Accepting
+*equal-length* results as the new starting point matters as much as the
+perturbation — without it the walk re-perturbs one permutation and never
+drifts.
 
 ```
 random n=40  →  33  →  29  →  28 → 26 → 25 → 24  →  23 → 22
@@ -118,8 +108,8 @@ python proofcheck.py                    # drat-trim over every UNSAT claim
 ```
 
 [`verify.py`](verify.py) and [`proofcheck.py`](proofcheck.py) import nothing
-from the solver package — a bug shared between checker and solver would be
-invisible otherwise.
+from the solver package, so a bug shared between checker and solver cannot
+hide.
 
 `proofcheck.py` needs [drat-trim](https://github.com/marijnheule/drat-trim),
 which is not bundled. On Windows with MinGW, `getc_unlocked` needs shimming:
@@ -136,8 +126,8 @@ python scripts/hunt.py hop --perm <witness> --workers 8        # basin hop
 python scripts/certify.py --perm <witness>                     # make artifacts
 ```
 
-The bound now sits exactly on Waton's guess of 22. Anything below it sides with
-Elder; 15 would settle the bet outright.
+The bound sits exactly on Waton's guess of 22; anything below it sides with
+Elder, and 15 would settle the bet outright.
 
 ## Layout
 
@@ -156,16 +146,13 @@ Elder; 15 would settle the bet outright.
 
 ## Caveats
 
-* **Upper bound, not an answer.** 22 is a basis element — no *deletion* of it
-  is unsortable — but that does not make it the shortest such permutation
-  anywhere. The truth is in [14, 22].
+* **An upper bound.** 22 is a basis element — no deletion of it is
+  unsortable — but it need not be the shortest such permutation anywhere.
+  The truth is in [14, 22].
 * **Not peer reviewed.** Verified is not refereed.
 * **The certificate proves the CNF is unsatisfiable**, not that the CNF asks
-  the right question. That is what the encoding proof and the exhaustive
-  brute-force agreement are for — see
-  [results.md § Verification](results.md#verification).
+  the right question. See [results.md § Verification](results.md#verification).
 * **Brute force cannot reach n = 22**, so at that size the simulator cannot
-  independently re-decide the instance. Stated plainly in results.md rather
-  than buried.
+  independently re-decide the instance.
 * Literature figures are taken from Vatter,
   [arXiv:2602.16355v2](https://arxiv.org/abs/2602.16355) (24 Aug 2026).

@@ -1,10 +1,9 @@
 """Test the machine model itself against the literature.
 
-The worry this answers: our answer could be wrong not because the solver is
-buggy but because we are *modelling the wrong machine*.  If our machine were
-more restrictive than "three stacks in series" as the literature means it,
-permutations would look unsortable that really are sortable, and every bound
-here would be worthless.
+The worry this answers: the answer could be wrong because we are *modelling
+the wrong machine*.  A machine more restrictive than "three stacks in series"
+as the literature means it would make permutations look unsortable that
+really are sortable, and every bound here would be worthless.
 
 The literature gives a sharp, falsifiable prediction to test against:
 
@@ -19,9 +18,10 @@ should, right up to the edge of the known-sortable range.
 
 The same logic pins the other end.  For two stacks the literature says the
 shortest unsortable permutation has length exactly 7; we reproduce 7, not 6
-(too restrictive) and not 8 (too permissive).  And one stack must give
-exactly Av(231) and the Catalan numbers.  A model error would have to break
-all of these at once while leaving them individually consistent.
+(too restrictive) and not 8 (too permissive) -- the contrast is the test.
+One stack must give exactly Av(231) and the Catalan numbers.  A model error
+would have to break all of these at once while leaving them individually
+consistent.
 
     python scripts/validate_model.py --n 12 13 --trials 400
 """

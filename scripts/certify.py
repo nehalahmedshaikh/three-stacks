@@ -12,20 +12,18 @@ the pair to drat-trim, and ``verify.py`` re-decides small cases from scratch.
 For a permutation claimed SORTABLE the artifact is just the operation word,
 which ``verify.py replay`` checks completely on its own.
 
-The proof is produced by a **solver binary writing DRAT directly to a file**,
-not by PySAT's in-memory proof capture.  That capture turned out to truncate
-the proof stream: for the length-33 witness PySAT returned 15 MB of a proof
-that lingeling reported writing as 6.1 MB, and drat-trim rejected the result
-("conflict claimed, but not detected") even though the instance really is
+The proof comes from a **solver binary writing DRAT directly to a file**.
+PySAT's in-memory capture truncates the proof stream: for the length-33
+witness it returned 15 MB of a proof lingeling reported writing as 6.1 MB,
+and drat-trim rejected the result on an instance that really is
 unsatisfiable.  A truncated proof that still verifies is sound -- drat-trim
-checks every step -- but one that fails to verify is indistinguishable from
-a wrong answer, which is exactly what a certificate is supposed to rule out.
-So: file-backed proofs, always.
+checks every step -- but one that fails is indistinguishable from a wrong
+answer.
 
-Note carefully what the certificate does and does not say.  drat-trim proves
-*the CNF is unsatisfiable*.  That the CNF asks the sortability question is
-established separately: by the proof in docs/notes.md §3 and by exhaustive
-agreement with the brute-force simulator in tests/test_encoding.py.
+drat-trim proves *the CNF is unsatisfiable*.  That the CNF asks the
+sortability question is established separately, by the proof in
+docs/notes.md §3 and by exhaustive agreement with the brute-force simulator
+in tests/test_encoding.py.
 
     python scripts/certify.py --perm 2435761 --k 2
     python scripts/certify.py --from-witnesses --minimal-only

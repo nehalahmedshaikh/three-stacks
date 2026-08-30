@@ -1,15 +1,12 @@
 """Enumerate the FULL same-length neighbourhood of a witness, exhaustively.
 
-Sampling 300 neighbours and finding none unsortable is weak evidence: a
-length-22 permutation has only about 700-900 neighbours under the move set,
-so a third of them is not much coverage.  This enumerates every one.
+A length-22 permutation has only about 700-900 neighbours under the move set,
+so a 300-sample estimate covers barely a third.  This enumerates every one:
+all transpositions, all single-point relocations, all adjacent-value swaps.
+For n = 22 that is ~700 solver calls, about a minute across cores.
 
-Moves: all transpositions, all single-point relocations, all adjacent-value
-swaps.  For n = 22 that is ~700 solver calls, about a minute across cores.
-
-A neighbour that is still unsortable is directly useful -- if it is
-non-minimal, its unsortable deletion has length n-1.  So each unsortable
-neighbour found is immediately checked for that.
+An unsortable neighbour is directly useful -- if it is non-minimal, its
+unsortable deletion has length n-1 -- so each is checked for that.
 
     python scripts/neighbourhood.py --perm 6-14-2-... --k 3
 """

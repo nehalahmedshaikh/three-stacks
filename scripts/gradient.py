@@ -1,31 +1,26 @@
 ﻿"""Give the search a gradient, by counting instead of deciding.
 
-Every method so far has been blind, because sortability is a yes/no answer:
-at length 21 every permutation we try is sortable, and they all look
-identical to the search.  There is nothing to climb.
-
-So measure something real-valued instead.  For a permutation `p` of length
-L, define
+Sortability is a yes/no answer, so at length 21 every permutation we try is
+sortable and they all look identical to a search.  Measure something
+real-valued instead.  For a permutation `p` of length L, define
 
     f(p) = how many of its one-point extensions (length L+1) are unsortable
 
-f is a genuine "how nearly unsortable is this" score.  It is positive
-exactly when `p` sits inside a length-(L+1) obstruction, and larger when it
-sits inside many.  The 22 one-point deletions of our length-22 witness all
-have f >= 1 by construction, so there is somewhere to start.
+f scores how nearly unsortable `p` is: positive exactly when `p` sits inside
+a length-(L+1) obstruction, larger when it sits inside many.  The 22
+one-point deletions of our length-22 witness all have f >= 1, so there is
+somewhere to start.
 
-Two payoffs, and the second is the one that matters right now:
+Two payoffs:
 
-  * hill-climbing f at length 21 walks towards permutations that are close
-    to being obstructions, which is the direction a length-21 witness lies
-    in, if one exists;
+  * hill-climbing f at length 21 walks towards permutations close to being
+    obstructions, the direction a length-21 witness lies in if one exists;
   * **every unsortable extension found is a new length-22 basis element.**
-    We have exactly one, and its entire 651-neighbour ball is empty, so new
-    ones are the bottleneck for finding a 21.  This manufactures them.
+    We have exactly one, and its 651-neighbour ball is empty, so new ones
+    are the bottleneck for finding a 21.
 
-Cost: f needs (L+1)^2 decisions at length L+1 -- 484 at L=21.  That is only
-affordable because of FixedLengthDecider (118 ms each, shared CNF), and it
-is why this could not have been tried before that landed.
+Cost: f needs (L+1)^2 decisions at length L+1, 484 at L=21, affordable only
+via FixedLengthDecider (118 ms each, shared CNF).
 
     python scripts/gradient.py --length 21 --workers 12
 """

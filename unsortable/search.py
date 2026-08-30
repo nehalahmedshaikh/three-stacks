@@ -1,12 +1,12 @@
 """M4: hunting for unsortable permutations.
 
-The empirically useful route is "descend from above": random permutations of
-length ~40 are unsortable a good fraction of the time and the solver decides
-them in seconds, so a witness is cheap to find.  The work is then all in the
+The useful route is "descend from above": random permutations of length ~40
+are unsortable a good fraction of the time and the solver decides them in
+seconds, so a witness is cheap to find.  The work is then all in the
 minimiser (M3), which turns a long witness into a basis element.
 
-Also here: structured families worth trying, and a local search that walks a
-sortable permutation towards unsortability.
+Also here: structured families, and a local search that walks a sortable
+permutation towards unsortability.
 """
 
 from __future__ import annotations
@@ -112,11 +112,10 @@ def families(max_n: int = 60) -> Iterator[tuple[str, Perm]]:
 
 # --- basin hopping over basis elements --------------------------------------
 # Greedy descent stops at whatever basis element its random deletion order
-# happens to reach, and those are not all the same length.  Upward closure
-# gives a free way to escape: inserting points into an unsortable permutation
-# keeps it unsortable, so we can climb a few steps *with no search at all*
-# and descend again along a different path.  Every iterate is a guaranteed
-# witness; the only question is how short.
+# reaches, and those vary in length.  Upward closure gives a free escape:
+# inserting points into an unsortable permutation keeps it unsortable, so we
+# can climb a few steps with no search at all and descend again along a
+# different path.  Every iterate is a guaranteed witness.
 
 def insert_random_point(p: Perm, rng: random.Random) -> Perm:
     """Insert one new entry at a random position with a random value."""
@@ -135,13 +134,11 @@ def perturb(p: Perm, count: int, rng: random.Random) -> Perm:
 
 # --- same-length plateau walk -----------------------------------------------
 # Basin hopping moves along the plateau of length-L basis elements by climbing
-# a few points and descending again, which costs 100-200 solver calls, most of
-# them at lengths 25-30 where each is slow.  But a *same-length* move needs no
-# climb: one transposition, one solver call at length L.  If the result is
-# still unsortable we have moved sideways for ~1% of the price, and the only
-# thing that matters is whether it is non-minimal -- because a non-minimal
-# unsortable permutation of length L has an unsortable deletion of length L-1,
-# which is the whole objective.
+# a few points and descending again, costing 100-200 solver calls, most at
+# lengths 25-30 where each is slow.  A same-length move needs no climb: one
+# transposition, one solver call at length L.  What matters is whether the
+# result is non-minimal, since a non-minimal unsortable permutation of length
+# L has an unsortable deletion of length L-1.
 
 def same_length_neighbour(p: Perm, rng: random.Random) -> Perm:
     """A random permutation one small move away, same length."""

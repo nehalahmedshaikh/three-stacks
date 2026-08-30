@@ -1,10 +1,9 @@
 """Mine for new shortest witnesses, and probe each one immediately.
 
-The bottleneck is not compute, it is that we have exactly **one** basis
-element at the current best length, and its full 651-neighbour ball contains
-nothing unsortable.  A second one would give a second ball to probe, and any
-*non-minimal* unsortable permutation in any of those balls yields a witness
-one shorter.
+The bottleneck is having exactly **one** basis element at the current best
+length, whose full 651-neighbour ball contains nothing unsortable.  A second
+one gives a second ball to probe, and any non-minimal unsortable permutation
+in any ball yields a witness one shorter.
 
 So this loops:
 

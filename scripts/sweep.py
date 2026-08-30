@@ -4,20 +4,15 @@ A full n! sweep is out of reach (14! is ~63 days on 16 cores even at 1 ms a
 permutation).  Pinning a few positions cuts it by n(n-1)(n-2)...: pinning
 three at n = 14 leaves 11! = 39,916,800, which is well under an hour.
 
-What this can and cannot show:
+A witness certifies itself, so any unsortable permutation this turns up
+stands regardless of the heuristic restriction.  Finding nothing proves
+nothing: the pins come from the measured profile of the basis elements we
+happen to have (`scripts/shape.py`), a tendency rather than a theorem -- two
+of our thirteen violate even the strongest of them -- so the excluded
+permutations are simply untested.
 
-  * **It can find a witness.**  Any unsortable permutation it turns up is a
-    witness, and a witness certifies itself -- it does not matter that the
-    search space was restricted by a heuristic.
-  * **It cannot prove a lower bound.**  Finding nothing says nothing about
-    the permutations that were excluded.  The pins come from the measured
-    profile of the basis elements we happen to have (`scripts/shape.py`),
-    which is a tendency, not a theorem -- two of our thirteen basis elements
-    violate even the strongest of them.
-
-Work is split by the values assigned to the first two free positions, so the
-branches are independent and each worker enumerates its own slice locally
-rather than having millions of tuples shipped to it.
+Work is split by the values assigned to the first two free positions, so
+branches are independent and each worker enumerates its own slice locally.
 
     python scripts/sweep.py --n 14 --pin 1=4 --pin 3=2 --pin 14=1 --workers 14
 """

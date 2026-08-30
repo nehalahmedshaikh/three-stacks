@@ -1,12 +1,12 @@
 """M3: downward closure (the minimiser depends on it) and symmetries.
 
-The whole search strategy is "find something unsortable, then delete points
-until you cannot".  That is only sound if sortability is closed downward.
-It is (proof in docs/notes.md §4), but confirm it.
+The search strategy is "find something unsortable, then delete points until
+you cannot", which is sound only if sortability is closed downward.  It is
+(proof in docs/notes.md §4); these tests confirm it.
 
-Symmetry reduction, by contrast, is NOT available: measured here, none of
-reverse / complement / inverse / reverse-complement preserves sortability,
-for one stack or for two.  Nothing in the codebase may assume otherwise.
+Symmetry reduction is unavailable: none of reverse / complement / inverse /
+reverse-complement preserves sortability, for one stack or for two.  Nothing
+in the codebase may assume otherwise.
 """
 
 from __future__ import annotations

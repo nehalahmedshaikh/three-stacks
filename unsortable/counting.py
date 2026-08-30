@@ -19,10 +19,10 @@ crossover is a rigorous, search-free upper bound on the length of the
 shortest unsortable permutation.
 
 It is tight for ``k = 1`` (the map is a bijection there, ``B_1 = Catalan``,
-crossover 3, and ``231`` really is the answer) and very weak for ``k >= 2``:
+crossover 3, and ``231`` is the answer) and very weak for ``k >= 2``:
 ``B_k(n) ~ (k+1)^{(k+1)n} / poly``, so the crossover sits near
-``e * (k+1)^{k+1}`` -- around 74 for two stacks whose true answer is 7, and
-around 700 for three stacks whose true answer is somewhere in [14, 41].
+``e * (k+1)^{k+1}`` -- 50 for two stacks whose true answer is 7, and 642 for
+three stacks whose true answer is somewhere in [14, 22].
 """
 
 from __future__ import annotations

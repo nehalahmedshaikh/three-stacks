@@ -1,9 +1,9 @@
 """Where the search currently stands, and how to pick it back up.
 
-Everything the searches produce is written to disk as it happens -- witnesses
-on every descent step, certificates and basis reports as they are made -- so
-stopping and restarting loses at most one solver call.  This prints the state
-and the exact command to resume from the best witness found so far.
+Everything the searches produce is written to disk as it happens: witnesses
+on every descent step, certificates and basis reports as they are made.
+Stopping and restarting loses at most one solver call.  This prints the state
+and the command to resume from the best witness so far.
 
     python scripts/status.py
 """
