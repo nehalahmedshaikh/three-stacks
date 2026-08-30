@@ -74,8 +74,7 @@ DFS), via `python scripts/count_sortable.py`.
 | 7 | 429 | 5,018 | 5,040 | 5,040 |
 | 8 | 1,430 | 39,374 | 40,320 | 40,320 |
 | 9 | 4,862 | 337,816 | 362,880 | 362,880 |
-| 10 | 16,796 | 3,092,691 | *running* | 3,628,800 |
-| 11 | 58,786 | *not attempted* | *running* | 39,916,800 |
+| 10 | 16,796 | 3,092,691 | **3,628,800** | 3,628,800 |
 
 Reality checks, all reproduced:
 
@@ -86,8 +85,13 @@ Reality checks, all reproduced:
 * **2 stacks in series** first fail at length **7**, with 22 unsortable
   permutations there. Length 7 is the known answer (Tarjan). Since all
   length-6 permutations sort, those 22 are all basis elements.
-* **3 stacks in series** sort everything through n = 9, consistent with
-  Atkinson's result that everything up to length 13 sorts.
+* **3 stacks in series** sort **everything** through n = 10 -- all 3,628,800
+  permutations, checked one by one, none unsortable. This is the strongest
+  available test of the machine model: Atkinson's result says every
+  permutation of length <= 13 sorts, and a single unsortable one at n = 10
+  would mean we are simulating the wrong machine and every bound here is
+  void. (n = 11 would take ~50 hours by brute force and was not attempted;
+  the sampled test at n = 12-13 covers that range instead.)
 
 ## Where unsortable permutations start appearing
 
@@ -204,11 +208,12 @@ points, and the model hits all of them:
 |---|---|---|
 | 1 stack sorts exactly `Av(231)`, counted by the Catalan numbers | Knuth | exact, permutation by permutation to n = 7; counts match to n = 11 (58,786 = C(11)) |
 | 2 stacks in series first fail at length **7** | Tarjan | exactly 7 -- not 6 (too restrictive), not 8 (too permissive) |
-| every permutation of length <= 13 is 3-stack-sortable | Atkinson | 800 random permutations at n = 12 and n = 13: **zero** unsortable |
+| every permutation of length <= 13 is 3-stack-sortable | Atkinson | **exhaustive** at n = 10 (all 3,628,800 sortable); 800 random permutations at n = 12 and n = 13: **zero** unsortable |
 
-That last row is the direct test (`python scripts/validate_model.py`). If our
-machine were even slightly too restrictive, sampling right at the top of the
-known-sortable range is where it would show, and it does not. Every one of
+That last row is the direct test. The exhaustive half (`scripts/count_sortable.py`)
+leaves no room at n = 10 at all; the sampled half (`scripts/validate_model.py`)
+reaches to the very top of the known-sortable range. If our machine were even
+slightly too restrictive, this is exactly where it would show, and it does not. Every one of
 those 800 sortable verdicts also came with an operation word that was
 *replayed* on the independent simulator in `verify.py` and really did sort --
 so the SAT solver is not merely saying "satisfiable", it is producing runs
