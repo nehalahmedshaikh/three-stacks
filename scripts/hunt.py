@@ -161,6 +161,64 @@ def cmd_hop(a) -> int:
     return 0
 
 
+def cmd_walk(a) -> int:
+    """Random-walk the set of unsortable permutations at a FIXED length.
+
+    Basin hopping pays for every plateau step twice: a climb to length ~L+5
+    and a full descent back, ~100-200 solver calls with the expensive ones at
+    the top.  Walking sideways costs one call at length L per proposal.
+
+    The target is not another basis element -- it is a *non-minimal*
+    unsortable permutation, because that one has an unsortable deletion, and
+    that deletion has length L-1.  So each accepted step is followed by a
+    deletion scan, and the first unsortable deletion ends the search.
+    """
+    from unsortable.minimizer import _Scanner, _single_points, sat_decider
+    from concurrent.futures import ProcessPoolExecutor
+
+    rng = random.Random(a.seed)
+    cur = from_string(a.perm)
+    L = len(cur)
+    if solve(cur, k=a.k, mode="reduced").sortable:
+        print(f"{to_string(cur)} is sortable; give me an unsortable start")
+        return 1
+
+    pool = ProcessPoolExecutor(max_workers=a.workers) if a.workers > 1 else None
+    scan = _Scanner(sat_decider(a.k), a.k, "reduced", a.workers, pool)
+    accepted = rejected = 0
+    t0 = time.time()
+    try:
+        for it in range(a.iterations):
+            props = [(f"nbr{i}", q) for i, q in
+                     enumerate(search.neighbours(cur, rng, a.batch))]
+            hit = scan.first_unsortable(props)
+            if hit is None:
+                rejected += a.batch
+                continue
+            cur = hit[1]
+            accepted += 1
+            record("walk", cur, a.k, False, {"iteration": it})
+
+            # the payoff: is this one non-minimal?
+            shorter = scan.first_unsortable(_single_points(cur, rng))
+            if shorter is not None:
+                q = shorter[1]
+                print(f"\n*** LENGTH {len(q)} ***\n{to_string(q)}\n", flush=True)
+                record("walk-shorter", q, a.k, False, {"from": to_string(cur)})
+                return 0
+            if accepted % 10 == 0:
+                rate = accepted / max(accepted + rejected, 1)
+                print(f"[{it}] {accepted} accepted, {rejected} rejected "
+                      f"(accept {rate:.1%}), {scan.calls} calls, "
+                      f"{time.time()-t0:.0f}s, still {L}", flush=True)
+    finally:
+        if pool is not None:
+            pool.shutdown(wait=False, cancel_futures=True)
+    print(f"\nno length-{L-1} witness after {a.iterations} proposals "
+          f"({scan.calls} solver calls, {time.time()-t0:.0f}s)")
+    return 1
+
+
 def cmd_families(a) -> int:
     cache: dict = {}
     decide = sat_decider(a.k, cache=cache)
@@ -208,6 +266,13 @@ def main(argv=None) -> int:
     p.add_argument("--assume-minimal", action="store_true",
                    help="skip the initial descent (the start is already a basis element)")
     p.set_defaults(fn=cmd_hop)
+
+    p = sub.add_parser("walk", parents=[common])
+    p.add_argument("--perm", required=True, help="an unsortable starting permutation")
+    p.add_argument("--iterations", type=int, default=100000)
+    p.add_argument("--batch", type=int, default=24,
+                   help="neighbours proposed per step (evaluated in parallel)")
+    p.set_defaults(fn=cmd_walk)
 
     p = sub.add_parser("families", parents=[common])
     p.add_argument("--max-n", type=int, default=60)

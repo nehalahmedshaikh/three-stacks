@@ -193,6 +193,45 @@ the approach that worked. Combined with the inversion-density observation
 above, the short basis elements appear to sit in a narrow band: too ordered
 and three stacks cope easily, too disordered and the witness is long.
 
+## Why the search stops at 22
+
+The bound fell 24 -> 23 in 78 hopping iterations and 23 -> 22 in 149, then sat
+at 22 for several thousand. That is not a slow patch; it is a different
+regime, and the reason is measurable.
+
+Take a known basis element and ask how many of its *same-length* neighbours
+(one transposition, one point moved, one short segment reversed) are still
+unsortable. 300 samples each:
+
+| length | neighbours still unsortable |
+|---:|---:|
+| 29 | 40 / 300 (13.3%) |
+| 24 | 4 / 300 (1.3%) |
+| 23 | 3 / 300 (1.0%) |
+| **22** | **0 / 300 (0%)** |
+
+At length 29 the unsortable permutations form a connected region a local
+search can wander through. By 22 the witness is an **isolated point** -- every
+one of 300 neighbours sorts. So "the plateau at 22" is a misnomer: there is no
+plateau, and any same-length walk is dead on arrival (confirmed -- a walk at
+22 accepted fewer than 10 moves in six minutes, while the same walk at k = 2
+found a length-7 basis element from a length-8 one almost immediately).
+
+This also explains why basin hopping worked at all: it never moves sideways at
+the target length, it descends from lengths where the unsortable set is still
+fat. And it says something about how much room is left. The density of
+unsortable permutations collapses as length falls -- 13% to 1% to 0 over seven
+steps -- so if a length-21 witness exists it is rarer than a length-22 one by
+a wide margin, and neither local search nor random sampling will stumble on
+it. Going lower needs a structural construction or an exhaustive search over
+a restricted subspace, not more of the same compute.
+
+It is worth being careful about what this does *not* show. It measures the
+neighbourhood of the witnesses we have, not the whole space; the length-21
+unsortable permutations could be plentiful but nowhere near ours. And it is
+evidence about search difficulty, not a lower bound. The answer remains
+anywhere in [14, 22].
+
 ## Is the model even right?
 
 The bounds here are worthless if we are simulating the wrong machine. A model

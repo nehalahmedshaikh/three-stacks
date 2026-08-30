@@ -133,6 +133,49 @@ def perturb(p: Perm, count: int, rng: random.Random) -> Perm:
     return p
 
 
+# --- same-length plateau walk -----------------------------------------------
+# Basin hopping moves along the plateau of length-L basis elements by climbing
+# a few points and descending again, which costs 100-200 solver calls, most of
+# them at lengths 25-30 where each is slow.  But a *same-length* move needs no
+# climb: one transposition, one solver call at length L.  If the result is
+# still unsortable we have moved sideways for ~1% of the price, and the only
+# thing that matters is whether it is non-minimal -- because a non-minimal
+# unsortable permutation of length L has an unsortable deletion of length L-1,
+# which is the whole objective.
+
+def same_length_neighbour(p: Perm, rng: random.Random) -> Perm:
+    """A random permutation one small move away, same length."""
+    n = len(p)
+    q = list(p)
+    r = rng.random()
+    i, j = rng.randrange(n), rng.randrange(n)
+    if i == j:
+        j = (i + 1) % n
+    if r < 0.45:                      # transpose two entries
+        q[i], q[j] = q[j], q[i]
+    elif r < 0.75:                    # move one entry elsewhere
+        q.insert(j, q.pop(i))
+    elif r < 0.90:                    # reverse a short segment
+        a, b = min(i, j), max(i, j)
+        b = min(b, a + 4)
+        q[a:b + 1] = reversed(q[a:b + 1])
+    else:                             # swap two adjacent *values*
+        v = rng.randrange(1, n)
+        a, b = q.index(v), q.index(v + 1)
+        q[a], q[b] = q[b], q[a]
+    return tuple(q)
+
+
+def neighbours(p: Perm, rng: random.Random, count: int) -> list[Perm]:
+    out, seen = [], {p}
+    while len(out) < count:
+        q = same_length_neighbour(p, rng)
+        if q not in seen:
+            seen.add(q)
+            out.append(q)
+    return out
+
+
 # --- local search -----------------------------------------------------------
 
 def _neighbours(p: Perm, rng: random.Random, count: int) -> Iterator[Perm]:
