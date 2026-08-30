@@ -178,6 +178,39 @@ because B_3(n) ~ 256^n and n! only overtakes that around n ~ e*256.)
 * Every length-4 pattern occurs in every basis element, so whatever
   avoidance structure exists lives at larger patterns.
 
+### The witnesses have a measurable shape, and it is causal
+
+Over 25 basis elements of lengths 22-29 (`scripts/shape.py`):
+
+| property | basis elements | uniform permutation |
+|---|---|---|
+| position of value 1 | median 1.00 of the way through (range 0.93-1.00) | 0.50 |
+| position of value 2 | median 0.18 | 0.50 |
+| first entry, as a fraction of n | median 0.27 (range 0.25-0.48) | 0.50 |
+| alternation (zigzag rate) | 0.81-0.90 | 0.67 |
+
+They are strongly **zigzag** permutations that open about a quarter of the
+way up the value range and end on 1.
+
+This is not just a description of what the search happened to find -- it is
+*causal*, and the cheapest way to show that is to sample from the profile and
+count. At length 36, 150 samples each (`scripts/structured_search.py`):
+
+| distribution | unsortable |
+|---|---:|
+| uniform | 4 / 150 (2.7%) |
+| value 1 forced last | 37 / 150 (24.7%) |
+| zigzag + value 1 last | **100 / 150 (66.7%)** |
+
+A 25x improvement in hit rate. Since a witness certifies itself, a biased
+search costs nothing in rigour -- which is why `hunt.py random --structured`
+now draws its starting points from this profile instead of uniformly.
+
+What does *not* work is naive extrapolation across lengths: resampling all 25
+basis elements down to length 21 (preserving the normalised shape) gives 25
+candidates, and every one of them sorts. The shape is a strong prior, not a
+formula.
+
 ### Structured families are all sortable
 
 Iterated direct and skew sums of `231`, `312`, `2413`, `3142`, and layered

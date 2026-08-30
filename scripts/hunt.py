@@ -71,9 +71,20 @@ def cmd_random(a) -> int:
     cache: dict = {}
     decide = sat_decider(a.k, cache=cache)
     best = None
+    gen = None
+    if a.structured:
+        # Measured at length 36: uniform 2.7% unsortable, zigzag-with-1-last
+        # 66.7%.  Starting the descent inside that region beats starting from
+        # a uniform witness, and it starts shorter.
+        from scripts.structured_search import zigzag_one_last
+        gen = zigzag_one_last
     for rnd in range(a.rounds):
         t0 = time.time()
-        p = search.find_random_unsortable(a.n, decide, rng, trials=a.trials)
+        if gen is not None:
+            p = next((q for q in (gen(a.n, rng) for _ in range(a.trials))
+                      if not decide(q)), None)
+        else:
+            p = search.find_random_unsortable(a.n, decide, rng, trials=a.trials)
         if p is None:
             print(f"round {rnd}: no unsortable permutation in {a.trials} "
                   f"random tries at n={a.n}", flush=True)
@@ -260,6 +271,8 @@ def main(argv=None) -> int:
     p.add_argument("--n", type=int, default=40)
     p.add_argument("--rounds", type=int, default=10)
     p.add_argument("--trials", type=int, default=60)
+    p.add_argument("--structured", action="store_true",
+                   help="draw starts from the measured basis-element profile")
     p.set_defaults(fn=cmd_random)
 
     p = sub.add_parser("minimise", parents=[common])
