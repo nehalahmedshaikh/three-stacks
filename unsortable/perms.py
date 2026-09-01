@@ -73,6 +73,23 @@ SYMMETRIES = {
 }
 
 
+def sorting_dual(p: Sequence[int]) -> Perm:
+    """Reflection of the plot of p about the anti-diagonal.
+
+    Unlike the four maps above, this one *does* preserve k-stack-in-series
+    sortability: it is Proposition 5.2 of Vatter, arXiv:2602.16355, and
+    docs/notes.md §6 derives it inside the interval encoding as time
+    reversal.  It is the only symmetry available for search reduction.
+    """
+    return inverse(reverse_complement(p))
+
+
+def is_self_dual(p: Sequence[int]) -> bool:
+    """True iff sorting_dual fixes p.  Equivalently, complement(p) is an
+    involution -- so there are I(n) such permutations, not n!."""
+    return sorting_dual(p) == tuple(p)
+
+
 # --- patterns ---------------------------------------------------------------
 
 def standardise(seq: Sequence[int]) -> Perm:

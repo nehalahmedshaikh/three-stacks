@@ -143,8 +143,23 @@ python scripts/hunt.py hop --perm <witness> --workers 8        # basin hop
 python scripts/certify.py --perm <witness>                     # make artifacts
 ```
 
-The bound sits exactly on Waton's guess of 22; anything below it sides with
-Elder, and 15 would settle the bet outright.
+Local search is exhausted — every route reaches 22 and stops. The one
+reduction that makes an *exhaustive* sweep possible at the frontier is the
+**sorting dual** `D(pi) = inverse(reverse_complement(pi))`, which preserves
+sortability (Vatter, [arXiv:2602.16355](https://arxiv.org/abs/2602.16355)
+Prop. 5.2; derived in [docs/notes.md](docs/notes.md) §6). A permutation is
+self-dual iff its complement is an involution, so there are `I(n)` of them
+rather than `n!` — 46 million at length 17 against 356 trillion.
+
+```bash
+python scripts/dual.py verify                 # check the symmetry exhaustively
+python scripts/dual.py sweep --n 17           # every self-dual candidate
+python scripts/census.py --k 2 --maxlen 10    # complete basis census at k=2
+```
+
+Restricting to self-dual permutations is a conjecture, not a theorem — see
+[results.md](results.md#the-sorting-dual) for what a miss does and does not
+rule out.
 
 ## Layout
 
@@ -155,6 +170,8 @@ Elder, and 15 would settle the bet outright.
 | [`unsortable/minimizer.py`](unsortable/minimizer.py) | descent to a basis element, parallel across cores |
 | [`unsortable/search.py`](unsortable/search.py) | witness hunting, structured families, basin hopping |
 | [`unsortable/counting.py`](unsortable/counting.py) | the search-free counting ceiling |
+| [`scripts/dual.py`](scripts/dual.py) | the sorting dual: verify it, sweep the permutations it fixes |
+| [`scripts/census.py`](scripts/census.py) | exhaustive basis census (reproduces Atkinson's 22 at k=2) |
 | [`verify.py`](verify.py) | **independent** replayer and exhaustive checker |
 | [`proofcheck.py`](proofcheck.py) | **independent** drat-trim runner |
 | [`docs/notes.md`](docs/notes.md) | proofs: the encoding, the prunings, downward closure |

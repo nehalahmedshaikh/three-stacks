@@ -422,13 +422,118 @@ witnesses are at n = 22. Clause generation is uniform in n, so there is no
 mechanism for the encoding to become wrong only above 13, though the checks
 do not rule it out.
 
+## The sorting dual
+
+Sortability by k stacks in series is invariant under
+
+    D(pi) = inverse(reverse_complement(pi))
+
+the reflection of the plot of `pi` about the anti-diagonal. This is
+Proposition 5.2 of Vatter,
+[arXiv:2602.16355](https://arxiv.org/abs/2602.16355) -- the same paper this
+repo already cited for its literature figures. It was re-derived here first
+and found in the literature afterwards, which is the second time that has
+happened in this project; [docs/notes.md](docs/notes.md) §6 gives the
+derivation as time reversal of the interval encoding, and the attribution.
+
+Measured, not assumed:
+
+| check | result |
+|---|---|
+| `D` preserves sortability over all of `S_n`, k = 1, 2, 3, n <= 7 | agrees on every permutation |
+| `D` is an involution, n <= 6 | yes |
+| self-dual count, n = 1..10 | 1, 2, 4, 10, 26, 76, 232, 764, 2620, 9496 |
+| those are the involution numbers | `pi` is self-dual iff `complement(pi)` is an involution |
+| the complete k = 2 basis is `D`-closed, n = 7..10 | yes, at every length |
+| Pantone-Vatter's length-21 witness | self-dual |
+
+The last row is forced rather than surprising: the basis is `D`-closed and
+they report exactly one minimal permutation at length 21, so `D` has nowhere
+else to send it. It does make a usable cross-check of their uniqueness claim
+against a symmetry derived independently here, and the two agree.
+
+This also explains two coincidences that looked like separate clues. Their
+length-21 witness starts with 6 and has its maximum at position 16; our
+length-22 witness starts with 6 and also has its maximum at position 16.
+Self-duality forces `pos(max) = n+1 - pi_1` exactly, so for the length-21
+witness those are one fact, not two. Our length-22 witness is *not*
+self-dual, and `D` maps it to a different unsortable permutation of length 22,
+`7-3-13-9-17-5-2-12-21-8-15-4-19-11-6-16-22-10-18-14-20-1` -- a second
+witness at that length obtained without any search.
+
+### What it buys
+
+There are `I(n)` self-dual permutations rather than `n!`, and Atkinson's
+theorem pins the anti-diagonal point `(n, 1)` for a shortest witness, leaving
+`I(n-1)`:
+
+| length | self-dual candidates ending in 1 | vs. `n!` |
+|---|---|---|
+| 17 | `I(16)` = 46,206,736 | 3.6e14 |
+| 18 | `I(17)` = 211,799,312 | 6.4e15 |
+| 19 | `I(18)` = 997,313,824 | 1.2e17 |
+| 20 | `I(19)` = 4,809,701,440 | 2.4e18 |
+
+That is the difference between hopeless and affordable, and it is the first
+**exhaustive** statement this project can make at the frontier length --
+everything else here is local search with no coverage guarantee.
+
+The restriction to self-dual permutations is a conjecture, not a theorem. A
+miss rules out only self-dual witnesses, though `D`-closure means a length
+with no self-dual basis element has an *even* number of basis elements. The
+restriction finds the correct answer in both cases where the answer is known:
+`231` at k = 1 is self-dual, and 4 of the 22 shortest witnesses at k = 2 are
+(`3254761`, `3624751`, `4257361`, `4627351` -- all of which also end in 1, so
+both restrictions hold together).
+
+Run it with `python scripts/dual.py verify` and
+`python scripts/dual.py sweep --n 17`.
+
+## Exhaustive census at k = 2
+
+At k = 3 the first basis element is at length 17 or more, so everything about
+the shape of these permutations came from a handful of witnesses. At k = 2 the
+first is at length 7 and the whole picture is computable, which turns "does
+this clue mean anything?" into a question with an answer.
+
+| length | unsortable | basis elements | solver calls |
+|---|---|---|---|
+| 7 | 22 | **22** | 5,040 |
+| 8 | 946 | 51 | 39,425 |
+| 9 | 25,064 | 146 | 337,962 |
+| 10 | 536,109 | 604 | 3,093,295 |
+
+The length-7 row is a check against the literature, not a discovery:
+Atkinson (1992) found exactly 22 basis elements of length 7 for two stacks in
+series, and the census reproduces that count and the standard example
+`2435761`. The shortest level is also re-decided by the brute-force
+simulator, with no disagreements. `scripts/census.py`, data in
+`results/census_k2.json`.
+
+Two things the complete data settles that two k = 3 witnesses cannot:
+
+* **"Ends in 1" is about the shortest, not about basis elements generally.**
+  The rate falls 100% (length 7) -> 74.5% -> 17.1% -> 3.6% (length 10). So it
+  is exactly Atkinson's theorem, and the reason our length-22 witness ends in
+  1 despite not being shortest is that the rate one above the minimum is
+  still high.
+* **Basis elements proliferate fast**: 22, 51, 146, 604. Pantone and Vatter's
+  1 at length 21 against 7,354 at length 22 is the same shape one level up,
+  and it is why local search at length 22 finds witnesses easily and length
+  21 not at all.
+
 ## Negative results
 
-* **No symmetry is available.** None of reverse, complement, inverse, or
-  reverse-complement preserves sortability, for one stack or for two --
-  measured exhaustively to n = 7. For k = 1: `231` is unsortable while its
-  reverse `132`, complement `213`, inverse `312` and reverse-complement `312`
-  all sort. No symmetry reduction is sound, and none is used.
+* **None of the four single symmetries is available**, but their composition
+  is. Reverse, complement, inverse and reverse-complement each fail to
+  preserve sortability, for one stack or for two, measured exhaustively to
+  n = 7. For k = 1: `231` is unsortable while its reverse `132`, complement
+  `213`, inverse `312` and reverse-complement `312` all sort. This repo
+  originally concluded from those four measurements that no symmetry existed.
+  That was wrong -- `inverse o reverse o complement` does preserve
+  sortability. See [The sorting dual](#the-sorting-dual). Testing the
+  generators of a group and concluding nothing in the group works is a bad
+  inference, and it cost the project its one available search reduction.
 * **Downward closure holds**, as it must -- verified exhaustively for
   k = 1, 2, 3 at n <= 7, and proved in [docs/notes.md](docs/notes.md) §4. The
   entire minimiser rests on it.
