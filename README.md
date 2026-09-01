@@ -10,10 +10,12 @@
 > 6-3-12-8-17-5-2-11-7-19-14-10-4-18-13-21-16-9-20-15-1
 > ```
 >
-> They also raised the lower bound from 13 to 16 using constructions of
-> sortable permutations, and report 7,354 minimal permutations at length 22
-> against the one this repo found. Their method — local search proposing
-> candidates, SAT deciding them — is the same one derived here independently.
+> They also proved that **every permutation of length 16 or less is
+> sortable** — so the answer is at least 17, up from Atkinson's 14 — and
+> report 7,354 minimal permutations at length 22 against the one this repo
+> found. Their method (hill climbing and simulated annealing proposing
+> candidates, a SAT formulation deciding them) is the same one derived here
+> independently. Lengths **17, 18, 19 and 20 remain open**.
 >
 > This repo's own bound is **22**, reached before that work was known to us.
 > What remains useful: the length-21 witness above is **independently

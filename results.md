@@ -11,9 +11,11 @@ length-21 witness `6-3-12-8-17-5-2-11-7-19-14-10-4-18-13-21-16-9-20-15-1` is
 independently verified in this repo (unsortable, all 21 one-point deletions
 sortable with replayed operation words, DRAT checked by drat-trim); its
 certificate is `proofs/k3_n21_39ee15ca.*` and it is tagged `external` in
-`results/claims.json`. They also raised the lower bound to 16 via
-constructions of sortable permutations, and report 7,354 minimal permutations
-at length 22 where this repo's search found one.
+`results/claims.json`. They also proved that every permutation of length 16
+or less is sortable, so the answer is at least 17 (up from Atkinson's 14),
+and report 7,354 minimal permutations at length 22 where this repo's search
+found one. That leaves lengths **17, 18, 19 and 20** open, which is what
+[The sorting dual](#the-sorting-dual) sweeps.
 
 Two things below are corrected by their work rather than wrong on their own
 terms. Atkinson (1992) had already proved that **every shortest permutation
@@ -477,6 +479,27 @@ theorem pins the anti-diagonal point `(n, 1)` for a shortest witness, leaving
 That is the difference between hopeless and affordable, and it is the first
 **exhaustive** statement this project can make at the frontier length --
 everything else here is local search with no coverage guarantee.
+
+### Sweep results
+
+| length | candidates | decided | rate | unsortable found |
+|---|---|---|---|---|
+| 17 | `I(16)` = 46,206,736 | all | 4,217/s | **0** |
+
+**Length 17 is clear of self-dual witnesses.** No permutation of length 17
+that is self-dual and ends in 1 is unsortable by three stacks in series --
+46,206,736 candidates, every one decided, 182.6 minutes on 12 cores.
+
+Two things follow, and only these two. Since the basis is `D`-closed, a
+length whose basis contains no self-dual element has its basis paired up by
+`D`, so **if the answer is 17 then the number of minimal permutations at
+length 17 is even**. And that sits oddly beside length 21, where Pantone and
+Vatter report exactly *one* -- an odd count, which forces that one to be
+self-dual. Whatever is true at 17 has a different character from what is true
+at 21.
+
+What does *not* follow: that the answer exceeds 17. A length-17 witness need
+not be self-dual, and this sweep says nothing about those.
 
 The restriction to self-dual permutations is a conjecture, not a theorem. A
 miss rules out only self-dual witnesses, though `D`-closure means a length
