@@ -151,8 +151,34 @@ def verify(maxlen: int, k: int) -> bool:
     return bool(ok)
 
 
-def sweep(n: int, k: int, depth: int, workers: int) -> list[str]:
-    tasks = [(p, i, n - 1, n, k) for p, i in _prefixes(n - 1, depth)]
+def _choose_depth(m: int, workers: int, target: int = 25000) -> int:
+    """Pick a splitting depth that keeps the work-unit count sane.
+
+    Too few units and the tail is one worker finishing a huge subtree while
+    eleven sit idle; too many and the parent spends all its time pickling
+    them and starves the pool -- at length 18, depth 5 produced 351,316 units
+    and the workers accumulated 29 seconds of CPU in 79 minutes while the
+    parent burned 1,937.  Anything from a few thousand to a few tens of
+    thousands behaves.
+    """
+    best = 2
+    for d in range(2, m):
+        count = len(_prefixes(m, d))
+        best = d
+        if count >= max(target, workers * 200):
+            break
+    return best
+
+
+def sweep(n: int, k: int, depth: int | None, workers: int) -> list[str]:
+    m = n - 1
+    if depth is None:
+        depth = _choose_depth(m, workers)
+        print(f"chose --depth {depth} automatically", flush=True)
+    tasks = [(p, i, n - 1, n, k) for p, i in _prefixes(m, depth)]
+    if len(tasks) > 120000:
+        print(f"warning: {len(tasks):,} work units is enough for the parent "
+              f"to starve the pool; consider a smaller --depth", flush=True)
     print(f"length {n}, k={k}: sweeping every self-dual permutation ending "
           f"in 1 (I({n-1}) of them) in {len(tasks)} work units on {workers} "
           f"workers", flush=True)
@@ -192,8 +218,9 @@ def main(argv=None):
 
     s = sub.add_parser("sweep", parents=[common])
     s.add_argument("--n", type=int, required=True)
-    s.add_argument("--depth", type=int, default=4,
-                   help="how many matching decisions define a work unit")
+    s.add_argument("--depth", type=int, default=None,
+                   help="how many matching decisions define a work unit "
+                        "(default: chosen automatically)")
     s.add_argument("--workers", type=int, default=8)
 
     args = ap.parse_args(argv)

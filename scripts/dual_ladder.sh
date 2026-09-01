@@ -16,7 +16,7 @@ for n in "$@"; do
   log="logs/dual${n}.log"
   echo "=== length $n -> $log ==="
   .venv/Scripts/python.exe -u scripts/dual.py sweep --n "$n" --k 3 \
-      --depth 5 --workers "$WORKERS" > "$log" 2> "logs/dual${n}.err"
+      --workers "$WORKERS" > "$log" 2> "logs/dual${n}.err"
   if grep -q "UNSORTABLE" "$log"; then
     echo "HIT at length $n -- stopping the ladder"
     grep "UNSORTABLE" "$log"
