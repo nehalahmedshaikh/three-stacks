@@ -1,5 +1,26 @@
 # three-stacks
 
+> ### This result is superseded
+>
+> **Pantone and Vatter (2026) have the bound at [17, 21]**, presented in
+> [this MathFest talk](https://vincevatter.com/talks/2026-mathfest-stacks/).
+> Their shortest witness has length 21:
+>
+> ```
+> 6-3-12-8-17-5-2-11-7-19-14-10-4-18-13-21-16-9-20-15-1
+> ```
+>
+> They also raised the lower bound from 13 to 16 using constructions of
+> sortable permutations, and report 7,354 minimal permutations at length 22
+> against the one this repo found. Their method — local search proposing
+> candidates, SAT deciding them — is the same one derived here independently.
+>
+> This repo's own bound is **22**, reached before that work was known to us.
+> What remains useful: the length-21 witness above is **independently
+> verified here** (unsortable, all 21 one-point deletions sortable with
+> replayed operation words, DRAT checked by drat-trim), and the negative
+> results in [results.md](results.md) document why the search stalls.
+
 **A permutation of length 22 that three stacks in series cannot sort — with a
 machine-checkable proof.**
 
@@ -7,14 +28,10 @@ machine-checkable proof.**
 6-14-2-10-4-18-7-12-3-20-15-9-5-19-13-22-8-17-11-21-16-1
 ```
 
-The previous record was 38 (Atkinson, 1992), unbeaten for over thirty years,
-and no explicit witness had ever been published at any length. This one ships
-with a DRAT certificate anyone can check with someone else's checker.
-
 It is a **basis element**: unsortable, but every one of its 22 one-point
 deletions *is* sortable, each with an operation word you can replay by hand.
-So the answer lies in **[14, 22]** — exactly Waton's guess — and Murphy's
-conjecture of 25 is refuted.
+At the time this was built the record was 38 (Atkinson, 1992), so the bound
+[14, 22] refuted Murphy's conjecture of 25 and matched Waton's guess of 22.
 
 Full numbers, provenance, and caveats: **[results.md](results.md)**.
 

@@ -3,6 +3,29 @@
 Every number here says where it came from. "Verified" means the specific
 combination of checks listed in [Verification](#verification) at the bottom.
 
+## Superseded
+
+Pantone and Vatter (2026) have the bound at **[17, 21]** --
+[MathFest talk](https://vincevatter.com/talks/2026-mathfest-stacks/). Their
+length-21 witness `6-3-12-8-17-5-2-11-7-19-14-10-4-18-13-21-16-9-20-15-1` is
+independently verified in this repo (unsortable, all 21 one-point deletions
+sortable with replayed operation words, DRAT checked by drat-trim); its
+certificate is `proofs/k3_n21_39ee15ca.*` and it is tagged `external` in
+`results/claims.json`. They also raised the lower bound to 16 via
+constructions of sortable permutations, and report 7,354 minimal permutations
+at length 22 where this repo's search found one.
+
+Two things below are corrected by their work rather than wrong on their own
+terms. Atkinson (1992) had already proved that **every shortest permutation
+unsortable by t stacks in series ends in 1** -- the pattern measured in
+[What the basis elements look like](#what-the-basis-elements-look-like) is
+that theorem, not a new observation, and the two exceptions there are length
+29 and 33, which are minimal but not shortest. And the isolation results are
+local facts about the particular witnesses probed: 7,354 minimal permutations
+exist at length 22, so that set is large and scattered rather than small.
+
+Everything else stands as measured. This repo's own bound is 22.
+
 ## The headline
 
 **The shortest permutation not sortable by three stacks in series has length
@@ -30,7 +53,8 @@ recorded in [`results/basis_elements.json`](results/basis_elements.json).
 | Waton's guess | 22 | Elder-Waton wager |
 | **this repo** | **<= 22** | verified, certificate included |
 | Murphy's conjecture | 25 | **refuted** -- see below |
-| Atkinson 1992, Lemma 5 | <= 38 | previous record, "has stood for over thirty years" |
+| Atkinson 1992, Lemma 5 | <= 38 | the record when this was built |
+| **Pantone and Vatter 2026** | **<= 21**, lower bound 16 | supersedes all of the above |
 | Murphy | <= 39 / 43 | never presented |
 | Tarjan | <= 41 | never presented |
 | counting ceiling (M6) | <= 642 | rigorous, search-free, this repo |
@@ -40,9 +64,8 @@ Problems in Permutation Patterns: Unimodality, Equivalence, Derangements, and
 Sorting*, [arXiv:2602.16355v2](https://arxiv.org/abs/2602.16355) (24 August
 2026). That survey states that **no explicit unsortable permutation for three
 stacks is presented anywhere** -- not Tarjan's, not Murphy's, not Atkinson's
-38. As far as we can tell the permutations here are the first explicit,
-independently checkable witnesses of any length. So the answer lies in
-**[14, 22]** -- exactly Waton's guess of 22, and 7 above Elder's 15.
+38. So this repo's bound is **[14, 22]** -- Waton's guess of 22, and 7 above
+Elder's 15. Superseded by [17, 21]; see [Superseded](#superseded).
 
 ### Murphy's conjecture, precisely
 

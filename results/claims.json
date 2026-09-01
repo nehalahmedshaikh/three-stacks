@@ -1,5 +1,29 @@
 [
   {
+    "id": "k3_n21_39ee15ca",
+    "perm": "6-3-12-8-17-5-2-11-7-19-14-10-4-18-13-21-16-9-20-15-1",
+    "n": 21,
+    "k": 3,
+    "encoding": "full",
+    "n_vars": 3486,
+    "n_clauses": 191931,
+    "cnf": "proofs/k3_n21_39ee15ca.cnf",
+    "sortable": false,
+    "solver": "cadical.exe (external, file-backed proof)",
+    "solve_seconds": 1.359,
+    "drat": "proofs/k3_n21_39ee15ca.drat",
+    "drat_bytes": 5636151,
+    "evidence": "DRAT certificate (check with proofcheck.py)",
+    "second_solver": {
+      "name": "glucose4 (pysat)",
+      "sortable": false,
+      "agrees": true
+    },
+    "external": true,
+    "source": "Pantone and Vatter (2026), MathFest talk: https://vincevatter.com/talks/2026-mathfest-stacks/",
+    "note": "independently verified here; not found by this repo's search"
+  },
+  {
     "id": "k3_n22_332bfe43",
     "perm": "6-14-2-10-4-18-7-12-3-20-15-9-5-19-13-22-8-17-11-21-16-1",
     "n": 22,
