@@ -19,6 +19,7 @@ simulator, no SAT solver involved.
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import sys
 import time
@@ -42,7 +43,9 @@ def main(argv=None) -> int:
     ap.add_argument("--perm", required=True)
     ap.add_argument("--k", type=int, default=3)
     ap.add_argument("--skip-certificate", action="store_true",
-                    help="skip regenerating the DRAT artifacts")
+                    help="decide unsortability in memory instead of writing "
+                         "and checking a DRAT certificate (no solver binaries "
+                         "needed; the verdict is then a solver verdict only)")
     a = ap.parse_args(argv)
 
     perm = from_string(a.perm)
@@ -52,12 +55,33 @@ def main(argv=None) -> int:
 
     report = {"perm": to_string(perm), "n": n, "k": a.k}
 
-    if not a.skip_certificate:
+    # Step 1 is not optional.  --skip-certificate used to skip it altogether,
+    # which made this script report the identity permutation as a basis
+    # element: every deletion of it is sortable, and nothing ever checked that
+    # the permutation itself was not.
+    if a.skip_certificate:
+        print("[1] deciding whether the permutation is UNSORTABLE "
+              "(in memory, no certificate) ...", flush=True)
+        r = solve(perm, k=a.k, mode="reduced")
+        report["unsortable_claim"] = {"sortable": bool(r.sortable),
+                                      "certified": False}
+        if r.sortable:
+            print(f"    SORTABLE -- {to_string(perm)} is not a witness at all.")
+            if r.ops is not None and verify.sorts(list(perm), r.ops, k=a.k):
+                print(f"    operation word, replayable with verify.py: "
+                      f"{''.join(map(str, r.ops))}")
+            print("\nVERDICT: not a witness.")
+            return 1
+        print("    UNSORTABLE (solver verdict; rerun without "
+              "--skip-certificate for a DRAT certificate)\n")
+    else:
         print("[1] certifying the permutation itself is UNSORTABLE ...", flush=True)
         e = certify(perm, k=a.k, brute_force=False)
+        e["certified"] = True
         report["unsortable_claim"] = e
         if e["sortable"]:
             print("    !! SOLVER SAYS SORTABLE -- this is not a witness at all")
+            print("\nVERDICT: not a witness.")
             return 1
         print(f"    UNSAT in {e['solve_seconds']}s, "
               f"{e['drat_bytes'] / 1e6:.1f} MB DRAT -> {e['drat']}")
@@ -92,9 +116,25 @@ def main(argv=None) -> int:
     print(f"    {good}/{n} deletions sortable, each with a replayed "
           f"operation word ({dt:.1f}s)\n")
 
-    is_basis = bad == 0
+    # Both halves are required.  Reaching here means step 1 found the
+    # permutation unsortable, since the sortable branches return early.
+    unsortable = not report["unsortable_claim"]["sortable"]
+    is_basis = unsortable and bad == 0
     report["is_basis_element"] = is_basis
-    out = RESULTS / f"basis_k{a.k}_n{n}.json"
+
+    # A report for somebody else's permutation must not overwrite ours, and
+    # must not land under a name the doc-consistency tests expect to find in
+    # claims.json.  Only permutations this repo actually claims get the plain
+    # filename.
+    claims_path = RESULTS / "claims.json"
+    ours = set()
+    if claims_path.exists():
+        ours = {c["perm"] for c in json.loads(claims_path.read_text())}
+    if to_string(perm) in ours:
+        out = RESULTS / f"basis_k{a.k}_n{n}.json"
+    else:
+        tag = hashlib.sha1(to_string(perm).encode()).hexdigest()[:8]
+        out = RESULTS / f"basis_k{a.k}_n{n}_{tag}.json"
     out.parent.mkdir(parents=True, exist_ok=True)
     out.write_text(json.dumps(report, indent=2) + "\n")
 
@@ -102,10 +142,17 @@ def main(argv=None) -> int:
         print(f"VERDICT: {to_string(perm)} is a BASIS ELEMENT of the "
               f"{a.k}-stack-sortable class.")
         print(f"         The shortest such basis element has length <= {n}.")
+        if a.skip_certificate:
+            print("         (solver verdict only -- no DRAT certificate was "
+                  "produced)")
     else:
         print(f"VERDICT: NOT minimal -- {bad} deletion(s) are still unsortable. "
               f"Run the minimiser.")
-    print(f"wrote {out.relative_to(ROOT)}")
+    try:
+        shown = out.relative_to(ROOT)
+    except ValueError:
+        shown = out          # an output directory outside the repo is fine
+    print(f"wrote {shown}")
     return 0 if is_basis else 1
 
 

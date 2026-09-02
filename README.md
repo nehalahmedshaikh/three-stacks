@@ -130,12 +130,40 @@ python proofcheck.py                    # drat-trim over every UNSAT claim
 from the solver package, so a bug shared between checker and solver cannot
 hide.
 
-`proofcheck.py` needs [drat-trim](https://github.com/marijnheule/drat-trim),
-which is not bundled. On Windows with MinGW, `getc_unlocked` needs shimming:
+`proofcheck.py` needs [drat-trim](https://github.com/marijnheule/drat-trim)
+and `scripts/certify.py` needs a CaDiCaL binary. Neither is bundled; the
+tests skip rather than fail without them. Build instructions, including the
+MinGW shim and the two Windows traps that cost hours, are in
+[docs/building.md](docs/building.md).
+
+## Check a candidate of your own
+
+Lengths **17, 18, 19 and 20** are the open ones. If you have a permutation you
+think three stacks cannot sort, this answers both questions about it — is it
+unsortable, and is it minimal:
 
 ```bash
-gcc -O2 -Dgetc_unlocked=getc -o tools/drat-trim.exe drat-trim/drat-trim.c
+# solver verdict only; needs nothing but python-sat
+python scripts/verify_basis.py --perm 6-3-12-8-17-5-2-11-7-19-14-10-4-18-13-21-16-9-20-15-1 --k 3 --skip-certificate
+
+# the same, plus a DRAT certificate checked by drat-trim
+python scripts/verify_basis.py --perm <your permutation> --k 3
 ```
+
+Exit status is 0 for a basis element and 1 otherwise, and the output says
+which way it failed:
+
+* **sortable** — it prints an operation word you can replay with
+  `verify.py replay`, so the refutation needs no trust in the solver;
+* **not minimal** — it prints the shorter witness hiding inside it, which you
+  can then feed back in;
+* **basis element** — every one-point deletion comes with a replayable
+  operation word, so the positive half of the claim is checkable with a
+  twenty-line simulator.
+
+Permutations are `6-3-12-...` or `2435761` for single digits. Reports land in
+`results/` under a name tagged with the permutation's hash, so they never
+overwrite the ones committed here.
 
 ## Hunt for something shorter
 

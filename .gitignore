@@ -4,13 +4,18 @@ __pycache__/
 *.egg-info/
 .pytest_cache/
 
-# built third-party checkers/solvers (see README for how to build them)
+# built third-party checkers/solvers (see docs/building.md)
 tools/
 drat-trim/
 cadical/
 
-# scratch sweeps; the curated witnesses live in results/claims.json
+# scratch sweeps; the minimal ones are promoted into results/basis_found.json
+# by scripts/promote_witnesses.py, and the certified ones live in claims.json
 results/witnesses.jsonl
+
+# reports produced by verify_basis.py for permutations this repo does not
+# claim; the hash suffix keeps them from overwriting the committed ones
+results/basis_k*_n*_*.json
 
 # Certificates are large and fully regenerable:
 #   python scripts/certify.py --perm <perm> --k 3

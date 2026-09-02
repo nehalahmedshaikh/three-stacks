@@ -550,6 +550,27 @@ Two things the complete data settles that two k = 3 witnesses cannot:
   and it is why local search at length 22 finds witnesses easily and length
   21 not at all.
 
+## Every basis element the search found
+
+`results/basis_found.json` records all 51 distinct basis elements this repo's
+search produced — unsortable, with every one-point deletion sortable:
+
+| k | lengths |
+|---|---|
+| 2 | 7 (17 of the 22; the complete set is in `census_k2.json`) |
+| 3 | 21, 22, 23 (**13 of them**), 24 (3), 25 (2), 26 (6), 27 (2), 28 (2), 29 (2), 31, 33 |
+
+These are solver verdicts, reproducible with `scripts/verify_basis.py`, and
+**not** DRAT-certified — only the four pairs in `claims.json` carry
+certificates. The file exists because the log it came from
+(`results/witnesses.jsonl`) is git-ignored, so a fresh clone would not have
+them; `scripts/promote_witnesses.py` regenerates it where the log survives.
+
+The 13 at length 23 are worth noting against Pantone and Vatter's 7,354 at
+length 22: basis elements are plentiful one or two above the minimum and
+vanishingly rare at it, which is exactly why local search converged on 22 so
+easily and never reached 21.
+
 ## Negative results
 
 * **None of the four single symmetries is available**, but their composition
