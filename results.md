@@ -482,24 +482,29 @@ everything else here is local search with no coverage guarantee.
 
 ### Sweep results
 
-| length | candidates | decided | rate | unsortable found |
-|---|---|---|---|---|
-| 17 | `I(16)` = 46,206,736 | all | 4,217/s | **0** |
+| length | candidates | decided | rate | time | unsortable found |
+|---|---|---|---|---|---|
+| 17 | `I(16)` = 46,206,736 | all | 4,217/s | 182.6 min | **0** |
+| 18 | `I(17)` = 211,799,312 | all | 6,047/s | 583.7 min | **0** |
+| 19 | `I(18)` = 997,313,824 | running | ~6,000/s | ~46 h | -- |
+| 20 | `I(19)` = 4,809,701,440 | queued | | ~10 days | -- |
 
-**Length 17 is clear of self-dual witnesses.** No permutation of length 17
-that is self-dual and ends in 1 is unsortable by three stacks in series --
-46,206,736 candidates, every one decided, 182.6 minutes on 12 cores.
+Logs: `results/sweep_k3_n17.log`, `results/sweep_k3_n18.log`.
+
+**Lengths 17 and 18 are clear of self-dual witnesses.** No permutation of
+either length that is self-dual and ends in 1 is unsortable by three stacks
+in series -- 258 million candidates, every one decided.
 
 Two things follow, and only these two. Since the basis is `D`-closed, a
 length whose basis contains no self-dual element has its basis paired up by
-`D`, so **if the answer is 17 then the number of minimal permutations at
-length 17 is even**. And that sits oddly beside length 21, where Pantone and
-Vatter report exactly *one* -- an odd count, which forces that one to be
-self-dual. Whatever is true at 17 has a different character from what is true
-at 21.
+`D`, so **if the answer is 17 or 18, the number of minimal permutations at
+that length is even**. And that sits oddly beside length 21, where Pantone
+and Vatter report exactly *one* -- an odd count, which forces that one to be
+self-dual. Whatever is true at 17 and 18 has a different character from what
+is true at 21.
 
-What does *not* follow: that the answer exceeds 17. A length-17 witness need
-not be self-dual, and this sweep says nothing about those.
+What does *not* follow: that the answer exceeds 18. A witness at either
+length need not be self-dual, and these sweeps say nothing about those.
 
 The restriction to self-dual permutations is a conjecture, not a theorem. A
 miss rules out only self-dual witnesses, though `D`-closure means a length
