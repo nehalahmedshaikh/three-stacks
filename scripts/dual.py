@@ -170,29 +170,41 @@ def _choose_depth(m: int, workers: int, target: int = 25000) -> int:
     return best
 
 
-def sweep(n: int, k: int, depth: int | None, workers: int) -> list[str]:
+def sweep(n: int, k: int, depth: int | None, workers: int,
+          skip: int = 0) -> list[str]:
     m = n - 1
     if depth is None:
         depth = _choose_depth(m, workers)
         print(f"chose --depth {depth} automatically", flush=True)
     tasks = [(p, i, n - 1, n, k) for p, i in _prefixes(m, depth)]
+    if skip:
+        # Work units are enumerated deterministically, so a run that stopped
+        # after reporting "[N/total]" can be resumed with --skip N.  These
+        # sweeps run for many hours; losing all of it to one interruption is
+        # not worth the few lines this costs.
+        print(f"resuming: skipping the first {skip:,} of {len(tasks):,} "
+              f"work units (already decided in an earlier run)", flush=True)
+        tasks = tasks[skip:]
     if len(tasks) > 120000:
         print(f"warning: {len(tasks):,} work units is enough for the parent "
               f"to starve the pool; consider a smaller --depth", flush=True)
     print(f"length {n}, k={k}: sweeping every self-dual permutation ending "
           f"in 1 (I({n-1}) of them) in {len(tasks)} work units on {workers} "
           f"workers", flush=True)
+    total = skip + len(tasks)
     t0, done, hits = time.time(), 0, []
     with ProcessPoolExecutor(max_workers=workers) as ex:
         for idx, (checked, hs) in enumerate(
-                ex.map(_scan, tasks, chunksize=1), start=1):
+                ex.map(_scan, tasks, chunksize=1), start=skip + 1):
             done += checked
             hits += hs
             for h in hs:
                 print(f"  *** UNSORTABLE at length {n}: {h}", flush=True)
-            if idx % 200 == 0 or idx == len(tasks):
+            if idx % 200 == 0 or idx == total:
                 el = time.time() - t0
-                print(f"  [{idx}/{len(tasks)}] {done:,} decided  "
+                # idx counts from the start of the whole sweep, not of this
+                # run, so --skip can be read straight off the last line again
+                print(f"  [{idx}/{total}] {done:,} decided this run  "
                       f"{done/max(el,1e-9):,.0f}/s  {el/60:.1f}m", flush=True)
     el = time.time() - t0
     print(f"\n{done:,} self-dual candidates decided in {el/60:.1f} min")
@@ -222,11 +234,14 @@ def main(argv=None):
                    help="how many matching decisions define a work unit "
                         "(default: chosen automatically)")
     s.add_argument("--workers", type=int, default=8)
+    s.add_argument("--skip", type=int, default=0,
+                   help="resume: skip this many leading work units, taken "
+                        "from the last '[N/total]' line of an earlier log")
 
     args = ap.parse_args(argv)
     if args.cmd == "verify":
         return 0 if verify(args.maxlen, args.k) else 1
-    sweep(args.n, args.k, args.depth, args.workers)
+    sweep(args.n, args.k, args.depth, args.workers, args.skip)
     return 0
 
 
