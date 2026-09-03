@@ -23,6 +23,7 @@ often each value appears, is the shape of the contradiction.
 from __future__ import annotations
 
 import argparse
+import shutil
 import subprocess
 import sys
 import tempfile
@@ -34,6 +35,15 @@ sys.path.insert(0, str(ROOT))
 
 from unsortable.encoding import _Builder
 from unsortable.perms import from_string, to_string
+
+
+def find_tool(name: str) -> str:
+    """Prefer a repo-local native binary, then Windows, then PATH."""
+    for filename in (name, f"{name}.exe"):
+        local = ROOT / "tools" / filename
+        if local.exists():
+            return str(local)
+    return shutil.which(name) or name
 
 
 def labelled_clauses(perm, k: int):
@@ -89,8 +99,8 @@ def main(argv=None) -> int:
                                  formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--perm", required=True)
     ap.add_argument("--k", type=int, default=3)
-    ap.add_argument("--solver", default=str(ROOT / "tools" / "cadical.exe"))
-    ap.add_argument("--drat-trim", default=str(ROOT / "tools" / "drat-trim.exe"))
+    ap.add_argument("--solver", default=find_tool("cadical"))
+    ap.add_argument("--drat-trim", default=find_tool("drat-trim"))
     a = ap.parse_args(argv)
 
     perm = from_string(a.perm)

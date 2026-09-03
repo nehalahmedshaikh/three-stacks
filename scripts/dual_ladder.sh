@@ -10,12 +10,18 @@
 set -u
 cd "$(dirname "$0")/.."
 WORKERS="${WORKERS:-12}"
+PYTHON="${PYTHON:-.venv/bin/python}"
 mkdir -p logs
+
+if [[ ! -x "$PYTHON" ]]; then
+  echo "Python not found at $PYTHON; create .venv or set PYTHON=/path/to/python" >&2
+  exit 2
+fi
 
 for n in "$@"; do
   log="logs/dual${n}.log"
   echo "=== length $n -> $log ==="
-  .venv/Scripts/python.exe -u scripts/dual.py sweep --n "$n" --k 3 \
+  "$PYTHON" -u scripts/dual.py sweep --n "$n" --k 3 \
       --workers "$WORKERS" > "$log" 2> "logs/dual${n}.err"
   if grep -q "UNSORTABLE" "$log"; then
     echo "HIT at length $n -- stopping the ladder"

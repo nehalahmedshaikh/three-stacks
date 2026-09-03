@@ -1,9 +1,8 @@
 """Where the search currently stands, and how to pick it back up.
 
-Everything the searches produce is written to disk as it happens: witnesses
-on every descent step, certificates and basis reports as they are made.
-Stopping and restarting loses at most one solver call.  This prints the state
-and the command to resume from the best witness so far.
+The tracked consolidated record preserves promoted basis elements; a local
+scratch log and canonical reports add detail when present. This prints the
+state and a command to resume from the best witness so far.
 
     python scripts/status.py
 """
@@ -18,6 +17,8 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
+from scripts.collect_witnesses import collect
+
 RESULTS = ROOT / "results"
 PROOFS = ROOT / "proofs"
 
@@ -26,25 +27,11 @@ def best_witnesses(k: int) -> list[tuple[int, str, str]]:
     """(length, perm, provenance), shortest first."""
     found: dict[str, tuple[int, str]] = {}
 
-    wf = RESULTS / "witnesses.jsonl"
-    if wf.exists():
-        for line in wf.read_text().splitlines():
-            if not line.strip():
-                continue
-            row = json.loads(line)
-            if row.get("k") == k and row.get("minimal"):
-                found.setdefault(row["perm"], (row["n"], "search (basis element)"))
-
-    cf = RESULTS / "claims.json"
-    if cf.exists():
-        for c in json.loads(cf.read_text()):
-            if c["k"] == k and not c["sortable"]:
-                found[c["perm"]] = (c["n"], f"certified ({c['id']})")
-
-    for bf in sorted(RESULTS.glob(f"basis_k{k}_n*.json")):
-        d = json.loads(bf.read_text())
-        if d.get("is_basis_element"):
-            found[d["perm"]] = (d["n"], f"BASIS ELEMENT, all {d['n']} deletions replayed")
+    for entry in collect(k):
+        why = entry["status"]
+        if entry.get("certificate_id"):
+            why += f" ({entry['certificate_id']})"
+        found[entry["perm"]] = (entry["n"], why)
 
     return sorted(((n, p, why) for p, (n, why) in found.items()))
 
@@ -84,9 +71,8 @@ def main(argv=None) -> int:
           f"  python scripts/hunt.py hop --k {a.k} --workers 7 --assume-minimal \\\n"
           f"      --plateau 0.9 --iterations 3000 --perm {best}")
     print(f"\nre-verify everything:\n"
-          f"  python scripts/verify_basis.py --k {a.k} --perm {best}\n"
-          f"  python proofcheck.py\n"
-          f"  python verify.py claims results/claims.json")
+          f"  python scripts/verify_basis.py --k {a.k} --perm {best} --skip-certificate\n"
+          f"  python proofcheck.py")
     return 0
 
 

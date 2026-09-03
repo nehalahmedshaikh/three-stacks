@@ -26,6 +26,7 @@ docs/notes.md §3 and by exhaustive agreement with the brute-force simulator
 in tests/test_encoding.py.
 
     python scripts/certify.py --perm 2435761 --k 2
+    python scripts/certify.py --claim-id k3_n25_b6356c09
     python scripts/certify.py --from-witnesses --minimal-only
 """
 
@@ -113,9 +114,10 @@ def certify(perm, k: int = 3, brute_force: bool = True,
     if binary is None:
         raise SystemExit(
             "No cadical binary found.  Build one and put it in tools/, or set\n"
-            "  THREE_STACKS_CADICAL=...\\cadical.exe\n"
+            "  THREE_STACKS_CADICAL=/path/to/cadical   # POSIX\n"
+            "  set THREE_STACKS_CADICAL=C:\\path\\to\\cadical.exe   # Windows\n"
             "  git clone --depth 1 https://github.com/arminbiere/cadical\n"
-            "  cd cadical && ./configure && make cadical")
+            "  cd cadical && ./configure && make")
 
     sat, model, dt = run_solver(binary, cnf_path, drat_path, timeout)
     entry["sortable"] = sat
@@ -156,7 +158,14 @@ def certify(perm, k: int = 3, brute_force: bool = True,
                                     "note": f"gave up after {e.args[0]} nodes"}
 
     (PROOFS / f"{cid}.json").write_text(json.dumps(entry, indent=2) + "\n")
-    claims = [c for c in load_claims() if c.get("id") != cid]
+    old_claims = load_claims()
+    old = next((c for c in old_claims if c.get("id") == cid), {})
+    # These describe provenance rather than generated artifacts and must
+    # survive a certificate refresh (notably for the external n=21 claim).
+    for key in ("external", "source", "note"):
+        if key in old:
+            entry[key] = old[key]
+    claims = [c for c in old_claims if c.get("id") != cid]
     claims.append(entry)
     claims.sort(key=lambda c: (c["k"], c["n"], c["perm"]))
     save_claims(claims)
@@ -176,6 +185,8 @@ def main(argv=None) -> int:
     ap = argparse.ArgumentParser(description=__doc__,
                                  formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--perm", action="append", default=[])
+    ap.add_argument("--claim-id", action="append", default=[],
+                    help="regenerate a claim already recorded in results/claims.json")
     ap.add_argument("--k", type=int, default=3)
     ap.add_argument("--from-witnesses", action="store_true")
     ap.add_argument("--minimal-only", action="store_true")
@@ -185,6 +196,13 @@ def main(argv=None) -> int:
     a = ap.parse_args(argv)
 
     targets = [(from_string(p), a.k) for p in a.perm]
+    if a.claim_id:
+        claims_by_id = {c["id"]: c for c in load_claims()}
+        missing = [cid for cid in a.claim_id if cid not in claims_by_id]
+        if missing:
+            ap.error("unknown claim id(s): " + ", ".join(missing))
+        targets.extend((from_string(claims_by_id[cid]["perm"]),
+                        claims_by_id[cid]["k"]) for cid in a.claim_id)
     if a.from_witnesses:
         wf = ROOT / "results" / "witnesses.jsonl"
         if wf.exists():
@@ -200,7 +218,7 @@ def main(argv=None) -> int:
                     seen.add(key)
                     targets.append((from_string(row["perm"]), row["k"]))
     if not targets:
-        ap.error("nothing to certify: pass --perm or --from-witnesses")
+        ap.error("nothing to certify: pass --perm, --claim-id, or --from-witnesses")
 
     for perm, k in targets:
         e = certify(perm, k=k, brute_force=not a.no_brute_force,

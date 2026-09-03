@@ -18,6 +18,9 @@ from unsortable.simulator import (
     sorting_sequence,
 )
 
+SLOW_N7 = pytest.param(7, marks=pytest.mark.slow)
+SLOW_N8 = pytest.param(8, marks=pytest.mark.slow)
+
 
 def catalan(n: int) -> int:
     return comb(2 * n, n) // (n + 1)
@@ -25,13 +28,13 @@ def catalan(n: int) -> int:
 
 # --- one stack: the fact everything else rests on ---------------------------
 
-@pytest.mark.parametrize("n", [1, 2, 3, 4, 5, 6, 7])
+@pytest.mark.parametrize("n", [1, 2, 3, 4, 5, 6, SLOW_N7])
 def test_one_stack_is_exactly_av231(n):
     for p in perms.all_perms(n):
         assert is_sortable(p, k=1) == perms.avoids(p, (2, 3, 1)), p
 
 
-@pytest.mark.parametrize("n", [1, 2, 3, 4, 5, 6, 7, 8])
+@pytest.mark.parametrize("n", [1, 2, 3, 4, 5, 6, SLOW_N7, SLOW_N8])
 def test_one_stack_counts_are_catalan(n):
     assert count_sortable(n, k=1) == catalan(n)
 
@@ -66,7 +69,7 @@ def test_agrees_with_independent_exhaustive_search(k, n):
 
 
 @pytest.mark.parametrize("k", [1, 2, 3])
-@pytest.mark.parametrize("n", [1, 2, 3, 4, 5, 6, 7])
+@pytest.mark.parametrize("n", [1, 2, 3, 4, 5, 6, SLOW_N7])
 def test_every_witness_replays(k, n):
     """Every op sequence the searcher returns really sorts the permutation."""
     for p in perms.all_perms(n):
@@ -79,7 +82,7 @@ def test_every_witness_replays(k, n):
 
 # --- three stacks: the regime we actually care about ------------------------
 
-@pytest.mark.parametrize("n", [1, 2, 3, 4, 5, 6, 7])
+@pytest.mark.parametrize("n", [1, 2, 3, 4, 5, 6, SLOW_N7])
 def test_three_stacks_sorts_everything_small(n):
     """Atkinson: everything up to length 13 is 3-stack-sortable.  Spot-check."""
     for p in perms.all_perms(n):

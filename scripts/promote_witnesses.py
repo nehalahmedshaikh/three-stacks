@@ -1,15 +1,13 @@
-"""Promote the minimal witnesses out of the scratch log into a tracked file.
+"""Promote minimal witnesses from the scratch log into a tracked file.
 
 `results/witnesses.jsonl` is git-ignored: it is an append-only log of
-everything the search touched, most of it non-minimal and superseded. But it
-is also the only place the *basis elements* live once the four certified pairs
-are set aside, and those are primary data -- each is a permutation that was
-decided unsortable while all of its one-point deletions were decided
-sortable. Deleting a working copy would lose them.
+everything the search touched, most of it non-minimal and superseded. Minimal
+entries are primary data: each was decided unsortable while all of its
+one-point deletions were decided sortable.
 
-This rewrites them into `results/basis_found.json`, deduplicated, with the
-provenance stated: they are solver verdicts, not DRAT-certified claims. Only
-the four in `claims.json` carry certificates.
+This merges them into `results/basis_found.json`, deduplicated, without
+discarding entries already promoted. They are solver verdicts, not claims;
+the claims recorded in `claims.json` have separate certificate metadata.
 """
 from __future__ import annotations
 
@@ -37,6 +35,13 @@ def main() -> int:
                                      .read_text())}
 
     seen: dict[tuple[int, str], dict] = {}
+    if OUT.exists():
+        previous = json.loads(OUT.read_text()).get("basis", {})
+        for k, levels in previous.items():
+            for permutations in levels.values():
+                for perm in permutations:
+                    seen[(int(k), perm)] = {"k": int(k), "perm": perm}
+
     for r in rows:
         if not r.get("minimal") or not r.get("perm"):
             continue
@@ -50,8 +55,8 @@ def main() -> int:
         by_k[k][n].append(perm)
 
     payload = {
-        "what": "basis elements found by this repo's search: unsortable, "
-                "every one-point deletion sortable",
+        "what": "basis elements consolidated from promoted search results: "
+                "unsortable, every one-point deletion sortable",
         "provenance": "solver verdicts from unsortable/encoding.py, "
                       "reproducible with scripts/verify_basis.py. NOT "
                       "DRAT-certified -- only the entries in claims.json "

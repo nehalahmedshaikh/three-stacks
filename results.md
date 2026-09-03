@@ -3,7 +3,7 @@
 Every number here says where it came from. "Verified" means the specific
 combination of checks listed in [Verification](#verification) at the bottom.
 
-## Superseded
+## Current status
 
 Pantone and Vatter (2026) have the bound at **[17, 21]** --
 [MathFest talk](https://vincevatter.com/talks/2026-mathfest-stacks/). Their
@@ -26,12 +26,12 @@ that theorem, not a new observation, and the two exceptions there are length
 local facts about the particular witnesses probed: 7,354 minimal permutations
 exist at length 22, so that set is large and scattered rather than small.
 
-Everything else stands as measured. This repo's own bound is 22.
+The measurements below remain valid; this repository's own upper bound is 22.
 
-## The headline
+## This repository's result
 
-**The shortest permutation not sortable by three stacks in series has length
-at most 22**, witnessed by
+This repository certifies that the following length-22 permutation is not
+sortable by three stacks in series:
 
 ```
 6-14-2-10-4-18-7-12-3-20-15-9-5-19-13-22-8-17-11-21-16-1
@@ -40,44 +40,45 @@ at most 22**, witnessed by
 which is a **basis element** of the 3-stack-sortable class: it is unsortable,
 and all 22 of its one-point deletions are sortable.
 
-Artifacts: [`proofs/k3_n22_332bfe43.cnf`](proofs/), `.drat`, `.json`, and
-[`results/basis_k3_n22.json`](results/) (operation words for all 22
-deletions). Basis elements of length 23 and 24 are separately certified, as
-are witnesses of length 25, 29 and 33. Every distinct basis element found is
-recorded in [`results/basis_elements.json`](results/basis_elements.json).
+Artifacts: [`CNF`](proofs/k3_n22_332bfe43.cnf),
+[`DRAT proof`](proofs/k3_n22_332bfe43.drat),
+[`metadata`](proofs/k3_n22_332bfe43.json), and
+[`results/basis_k3_n22.json`](results/basis_k3_n22.json), which contains
+operation words for all 22 deletions. The consolidated set of 51 recorded
+basis elements is in
+[`results/basis_found.json`](results/basis_found.json); the older
+[`results/basis_elements.json`](results/basis_elements.json) is the
+13-element snapshot used by some analyses below.
 
 ### State of the problem
 
 | bound | length | source |
 |---|---|---|
-| lower bound -- all shorter permutations sort | >= 14 | Atkinson; every permutation of length 7*2^(t-2)-1 = 13 is 3-stack-sortable |
+| Atkinson lower bound | answer >= 14 | every permutation through length `7*2^(t-2)-1 = 13` is 3-stack-sortable |
 | Elder's guess | 15 | Elder-Waton wager |
 | Waton's guess | 22 | Elder-Waton wager |
 | **this repo** | **<= 22** | verified, certificate included |
 | Murphy's conjecture | 25 | **refuted** -- see below |
 | Atkinson 1992, Lemma 5 | <= 38 | the record when this was built |
-| **Pantone and Vatter 2026** | **<= 21**, lower bound 16 | supersedes all of the above |
+| **Pantone and Vatter 2026** | **17 <= answer <= 21** | current best bounds |
 | Murphy | <= 39 / 43 | never presented |
 | Tarjan | <= 41 | never presented |
 | counting ceiling (M6) | <= 642 | rigorous, search-free, this repo |
 
-Literature figures are as reported in Vincent Vatter, *An Assortment of
+The historical literature figures are as reported in Vincent Vatter, *An Assortment of
 Problems in Permutation Patterns: Unimodality, Equivalence, Derangements, and
 Sorting*, [arXiv:2602.16355v2](https://arxiv.org/abs/2602.16355) (24 August
-2026). That survey states that **no explicit unsortable permutation for three
-stacks is presented anywhere** -- not Tarjan's, not Murphy's, not Atkinson's
-38. So this repo's bound is **[14, 22]** -- Waton's guess of 22, and 7 above
-Elder's 15. Superseded by [17, 21]; see [Superseded](#superseded).
+2026). That survey states that the older upper bounds did not present an
+explicit unsortable permutation for three stacks. This repository improved
+the then-known interval to **[14, 22]**; Pantone and Vatter subsequently
+improved it to **[17, 21]**.
 
 ### Murphy's conjecture, precisely
 
-Vatter states it as: "Murphy [69, Conjecture 265] guesses more generally that
-t stacks in series can sort all permutations of length up to (t+1)!, which
-would give **25** as the length of the shortest permutation unsortable by
-three stacks in series."
-
-So for t = 3 the conjecture is that *every* permutation of length <= 4! = 24
-is sortable, and hence that the answer is 25. The length-24 witness alone
+Murphy's general conjecture says that `t` stacks in series sort every
+permutation of length at most `(t+1)!`. For `t = 3`, every permutation of
+length at most `4! = 24` would therefore be sortable, making 25 the first
+possible unsortable length. The length-24 witness alone
 already refutes it -- a counterexample sitting exactly on the boundary the
 conjecture predicts -- and the length-22 one puts it well out of reach.
 
@@ -153,8 +154,9 @@ random n=40 witness
   -> 23 -> 22                    basin hopping + plateau drift
 ```
 
-Certified basis elements: **22**, 23, 24; certified witnesses at 25, 29, 33.
-Thirteen distinct basis elements in total, listed in
+At that stage, the certified basis elements had lengths **22**, 23, and 24,
+with certified witnesses at 25, 29, and 33. The 13 basis elements then known
+are preserved in
 [`results/basis_elements.json`](results/basis_elements.json).
 
 ## The counting ceiling (M6)
@@ -171,7 +173,7 @@ Once n! > B_k(n) an unsortable permutation must exist. Exact crossovers:
 |---:|---:|---|
 | 1 | **3** | **3** (`231`) -- the bound is exactly tight |
 | 2 | 50 | 7 |
-| 3 | **642** | in [14, 22] |
+| 3 | **642** | in [17, 21] |
 | 4 | 8,383 | unknown |
 
 Rigorous and search-free, but weak for k >= 2 -- 7x the truth at k = 2. It
@@ -180,7 +182,7 @@ around n ~ e*256.
 
 ## What the basis elements look like
 
-`scripts/analyse_basis.py` over the distinct basis elements found so far
+An early run of `scripts/analyse_basis.py` over the initial 13-element dataset
 (lengths 22, 23, 24, 25, 26x2, 27, 28x2, 29x2, 31, 33):
 
 * **Eleven of the thirteen end in `1`**, and both exceptions are among the
@@ -263,8 +265,8 @@ target length -- it descends from lengths where the unsortable set is fat.
 **This is not evidence that 22 is the answer.** The k=2 row is the control:
 at the known minimum for two stacks the neighbourhood is non-empty, and a
 walk started one above it drops to length 7 immediately. Isolation measures
-how hard a witness is to move away from. The answer remains anywhere in
-[14, 22].
+how hard a witness is to move away from. The current answer remains anywhere
+in [17, 21].
 
 The enumeration is useful for **population**: the exhaustive neighbourhood of
 the length-23 witness turned up four new length-23 basis elements in under
@@ -486,8 +488,8 @@ everything else here is local search with no coverage guarantee.
 |---|---|---|---|---|---|
 | 17 | `I(16)` = 46,206,736 | all | 4,217/s | 182.6 min | **0** |
 | 18 | `I(17)` = 211,799,312 | all | 6,047/s | 583.7 min | **0** |
-| 19 | `I(18)` = 997,313,824 | running | ~6,000/s | ~46 h | -- |
-| 20 | `I(19)` = 4,809,701,440 | queued | | ~10 days | -- |
+| 19 | `I(18)` = 997,313,824 | incomplete; progress not retained | ~6,000/s | ~46 h estimated | -- |
+| 20 | `I(19)` = 4,809,701,440 | not run | | ~10 days estimated | -- |
 
 Logs: `results/sweep_k3_n17.log`, `results/sweep_k3_n18.log`.
 
@@ -550,21 +552,23 @@ Two things the complete data settles that two k = 3 witnesses cannot:
   and it is why local search at length 22 finds witnesses easily and length
   21 not at all.
 
-## Every basis element the search found
+## Consolidated basis-element record
 
-`results/basis_found.json` records all 51 distinct basis elements this repo's
-search produced — unsortable, with every one-point deletion sortable:
+`results/basis_found.json` consolidates 51 distinct basis elements from the
+surviving search log and canonical reports—each is unsortable, with every
+one-point deletion sortable:
 
 | k | lengths |
 |---|---|
 | 2 | 7 (17 of the 22; the complete set is in `census_k2.json`) |
 | 3 | 21, 22, 23 (**13 of them**), 24 (3), 25 (2), 26 (6), 27 (2), 28 (2), 29 (2), 31, 33 |
 
-These are solver verdicts, reproducible with `scripts/verify_basis.py`, and
-**not** DRAT-certified — only the four pairs in `claims.json` carry
-certificates. The file exists because the log it came from
+These are solver verdicts, reproducible with `scripts/verify_basis.py`. Seven
+also appear in `results/claims.json`; four of those certificate pairs
+(lengths 21–24) are committed. The file exists because the log it came from
 (`results/witnesses.jsonl`) is git-ignored, so a fresh clone would not have
-them; `scripts/promote_witnesses.py` regenerates it where the log survives.
+them. `scripts/promote_witnesses.py` merges new minimal entries from that log
+into the tracked record without discarding existing entries.
 
 The 13 at length 23 are worth noting against Pantone and Vatter's 7,354 at
 length 22: basis elements are plentiful one or two above the minimum and
@@ -573,16 +577,10 @@ easily and never reached 21.
 
 ## Negative results
 
-* **None of the four single symmetries is available**, but their composition
-  is. Reverse, complement, inverse and reverse-complement each fail to
-  preserve sortability, for one stack or for two, measured exhaustively to
-  n = 7. For k = 1: `231` is unsortable while its reverse `132`, complement
-  `213`, inverse `312` and reverse-complement `312` all sort. This repo
-  originally concluded from those four measurements that no symmetry existed.
-  That was wrong -- `inverse o reverse o complement` does preserve
-  sortability. See [The sorting dual](#the-sorting-dual). Testing the
-  generators of a group and concluding nothing in the group works is a bad
-  inference, and it cost the project its one available search reduction.
+* **The four standard symmetries fail individually**, but
+  `inverse o reverse o complement` preserves sortability. See
+  [The sorting dual](#the-sorting-dual) for the correction, evidence, and
+  consequences.
 * **Downward closure holds**, as it must -- verified exhaustively for
   k = 1, 2, 3 at n <= 7, and proved in [docs/notes.md](docs/notes.md) §4. The
   entire minimiser rests on it.
@@ -591,18 +589,14 @@ easily and never reached 21.
   one-point deletion, so downward closure makes it sortable. The only route
   to a shorter witness is a *different* basis element, which is why the
   minimiser has no "deep" mode and basin hopping is the search.
-* **PySAT's in-memory proof capture truncates.** For the length-33 witness it
-  returned 15 MB of a proof lingeling reported writing as 6.1 MB, and
-  drat-trim rejected it ("conflict claimed, but not detected") on an instance
-  that is genuinely unsatisfiable. Different solvers failed on different
-  instances, which is the signature of lossy capture. All certificates are
-  now produced by a solver **binary writing DRAT straight to a file**. A
-  truncated proof that still verifies is sound -- drat-trim checks every step
-  -- but one that fails is indistinguishable from a wrong answer.
+* **PySAT's in-memory proof capture was unreliable.** Certificates therefore
+  come from a solver binary writing DRAT directly to disk. The observed
+  failure and build procedure are documented in
+  [`docs/building.md`](docs/building.md#why-not-capture-the-proof-in-memory).
 
 ## Verification
 
-Every claim in this file passes the checks that apply to it.
+Each claim uses the checks that apply to its type:
 
 | claim type | checks |
 |---|---|
@@ -611,20 +605,23 @@ Every claim in this file passes the checks that apply to it.
 | "pi is a basis element" | the above, plus n replayed operation words, one per one-point deletion |
 | the encoding itself | proved in [docs/notes.md](docs/notes.md) §3, and exhaustively equal to brute force for k = 1,2,3 at n <= 7 in both encoding modes, sampled to n = 11 |
 
-All six certificates currently in `proofs/` verify:
+The four committed certificate pairs verify:
 
 ```
-k3_n22_332bfe43  VERIFIED   k3_n23_4a24b696  VERIFIED   k3_n24_3a74bbc0  VERIFIED
-k3_n25_b6356c09  VERIFIED   k3_n29_9d1e218c  VERIFIED   k3_n33_10985bce  VERIFIED
+k3_n21_39ee15ca  VERIFIED   k3_n22_332bfe43  VERIFIED
+k3_n23_4a24b696  VERIFIED   k3_n24_3a74bbc0  VERIFIED
 ```
+
+The length-25, 29, and 33 claims retain tracked metadata but not their large
+CNF/DRAT pairs; regenerate them by claim ID as described in
+[`docs/building.md`](docs/building.md#regenerating-certificates).
 
 Reproduce:
 
-```
-python -m pytest                                   # 253 tests
-python scripts/verify_basis.py --perm 6-14-2-10-4-18-7-12-3-20-15-9-5-19-13-22-8-17-11-21-16-1
-python proofcheck.py                               # drat-trim over every UNSAT claim
-python verify.py claims results/claims.json        # replay every SAT claim
+```bash
+python -m pytest -n 4
+python scripts/verify_basis.py --perm 6-14-2-10-4-18-7-12-3-20-15-9-5-19-13-22-8-17-11-21-16-1 --skip-certificate
+python proofcheck.py
 ```
 
 ### What the certificate does not say

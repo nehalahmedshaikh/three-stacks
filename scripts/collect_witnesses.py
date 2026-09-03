@@ -1,10 +1,10 @@
-"""Consolidate every unsortable permutation found into one committed record.
+"""Consolidate recorded basis elements and their verification status.
 
 The search writes to results/witnesses.jsonl, an append-only scratch log full
-of intermediate descent steps, gitignored.  This distils it into
-results/basis_elements.json: one entry per distinct basis element with its
-verification status, so the repo carries a permanent record of everything
-found.
+of intermediate descent steps, gitignored. The durable
+results/basis_found.json preserves the minimal elements promoted from that
+log. This combines both sources with canonical reports and claims, producing
+results/basis_elements.json with one status-rich entry per element.
 
 Verification status per entry:
 
@@ -54,6 +54,18 @@ def collect(k: int) -> list[dict]:
                 "status": "search-only",
                 "found_by": row.get("kind", "search"),
             })
+
+    # The promoted record survives when the scratch log does not.
+    promoted = RESULTS / "basis_found.json"
+    if promoted.exists():
+        levels = json.loads(promoted.read_text()).get("basis", {}).get(str(k), {})
+        for n, permutations in levels.items():
+            for perm in permutations:
+                entries.setdefault(perm, {
+                    "perm": perm, "n": int(n), "k": k,
+                    "status": "search-only",
+                    "found_by": "consolidated record",
+                })
 
     # 2. full basis reports (all deletions replayed)
     for bf in sorted(RESULTS.glob(f"basis_k{k}_n*.json")):

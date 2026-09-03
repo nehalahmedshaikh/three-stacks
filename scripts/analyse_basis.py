@@ -1,8 +1,8 @@
-"""Look for shared structure among the basis elements we have found.
+"""Look for shared structure among the recorded basis elements.
 
 A pile of short basis elements is data; a *pattern* among them would be
-mathematics.  This script asks the obvious questions of whatever is recorded
-in results/witnesses.jsonl:
+mathematics. This script asks the obvious questions of the consolidated
+basis records:
 
   * how are the lengths distributed, and how many distinct ones did we see?
   * are any two related by a symmetry?  (none of the four symmetries
@@ -18,7 +18,6 @@ in results/witnesses.jsonl:
 from __future__ import annotations
 
 import argparse
-import json
 import random
 import sys
 from collections import Counter
@@ -28,27 +27,14 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
+from scripts.collect_witnesses import collect
 from unsortable import perms
 from unsortable.perms import Perm, from_string, standardise, to_string
 
 
 def load_basis_elements(min_len: int, max_len: int, k: int) -> list[Perm]:
-    seen: dict[Perm, None] = {}
-    wf = ROOT / "results" / "witnesses.jsonl"
-    if wf.exists():
-        for line in wf.read_text().splitlines():
-            if not line.strip():
-                continue
-            row = json.loads(line)
-            if row.get("k") != k or not row.get("minimal"):
-                continue
-            if min_len <= row["n"] <= max_len:
-                seen[from_string(row["perm"])] = None
-    for bf in sorted((ROOT / "results").glob(f"basis_k{k}_n*.json")):
-        d = json.loads(bf.read_text())
-        if d.get("is_basis_element") and min_len <= d["n"] <= max_len:
-            seen[from_string(d["perm"])] = None
-    return list(seen)
+    return [from_string(e["perm"]) for e in collect(k)
+            if min_len <= e["n"] <= max_len]
 
 
 def stats(p: Perm) -> dict:

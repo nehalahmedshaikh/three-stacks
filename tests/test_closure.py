@@ -22,8 +22,8 @@ import pytest
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 from unsortable import perms
-from unsortable.encoding import solve
-from unsortable.minimizer import delete_positions, minimise, sat_decider
+from unsortable.encoding import FixedLengthDecider, solve
+from unsortable.minimizer import delete_positions, minimise
 from unsortable.simulator import is_sortable
 
 
@@ -54,15 +54,20 @@ def test_unsortability_is_closed_upward_k2():
 @pytest.mark.slow
 def test_downward_closure_holds_for_long_k3_witnesses(k3_witness):
     """Same check for three stacks, where n<=7 has no unsortable cases."""
-    d = sat_decider(3)
     p = k3_witness
-    assert not d(p)
-    sortable_deletions = [q for q in perms.one_point_deletions(p) if d(q)]
-    # deleting a point may or may not restore sortability, but it must never
-    # turn a sortable permutation unsortable -- check that direction:
-    for q in sortable_deletions:
-        for r in perms.one_point_deletions(q):
-            assert d(r), (q, r)
+    assert not solve(p, k=3, mode="reduced").sortable
+    # The remaining work is in batches at two fixed lengths. Reuse each base
+    # formula instead of rebuilding and transferring it for every deletion.
+    with FixedLengthDecider(len(p) - 1, k=3) as middle:
+        sortable_deletions = [
+            q for q in perms.one_point_deletions(p) if middle.is_sortable(q)
+        ]
+    with FixedLengthDecider(len(p) - 2, k=3) as bottom:
+        # deleting a point may or may not restore sortability, but it must
+        # never turn a sortable permutation unsortable -- check that direction
+        for q in sortable_deletions:
+            for r in perms.one_point_deletions(q):
+                assert bottom.is_sortable(r), (q, r)
 
 
 # --- symmetries: measured, not assumed --------------------------------------

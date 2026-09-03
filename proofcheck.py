@@ -7,6 +7,11 @@ written by someone else -- and reports the verdict.
 
 drat-trim is not bundled.  Point this script at a binary with either
 
+    export THREE_STACKS_DRAT_TRIM=/path/to/drat-trim
+    python proofcheck.py
+
+or, on Windows,
+
     set THREE_STACKS_DRAT_TRIM=C:\\path\\to\\drat-trim.exe
     python proofcheck.py --drat-trim C:\\path\\to\\drat-trim.exe
 
@@ -95,7 +100,8 @@ def main(argv=None) -> int:
         print("\nBuild drat-trim and re-run:")
         print("  git clone https://github.com/marijnheule/drat-trim")
         print("  cd drat-trim && gcc -O2 -o drat-trim drat-trim.c")
-        print("  set THREE_STACKS_DRAT_TRIM=...\\drat-trim.exe")
+        print("  export THREE_STACKS_DRAT_TRIM=/path/to/drat-trim  # POSIX")
+        print("  set THREE_STACKS_DRAT_TRIM=C:\\path\\to\\drat-trim.exe  # Windows")
         return 2
 
     print(f"drat-trim: {binary}\n")
@@ -117,7 +123,7 @@ def main(argv=None) -> int:
             bad += 1
     print(f"\n{checked - bad}/{checked} certificates verified"
           + (f", {skipped} skipped (regenerate with scripts/certify.py "
-             f"--perm <perm>)" if skipped else ""))
+             f"--claim-id <id>)" if skipped else ""))
     if skipped and checked == 0:
         print("nothing to check -- regenerate the certificates first")
     return 0 if bad == 0 else 1

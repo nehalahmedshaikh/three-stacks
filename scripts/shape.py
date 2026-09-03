@@ -21,7 +21,6 @@ large ones sit, and how sharply that is determined.
 from __future__ import annotations
 
 import argparse
-import json
 import sys
 from collections import defaultdict
 from pathlib import Path
@@ -36,19 +35,8 @@ BANDS = 6  # how many position buckets when summarising
 
 
 def load(k: int, lo: int, hi: int) -> list[Perm]:
-    seen = {}
-    for e in collect(k):
-        if lo <= e["n"] <= hi:
-            seen[from_string(e["perm"])] = None
-    wf = ROOT / "results" / "witnesses.jsonl"
-    if wf.exists():
-        for line in wf.read_text().splitlines():
-            if not line.strip():
-                continue
-            row = json.loads(line)
-            if row.get("k") == k and row.get("minimal") and lo <= row["n"] <= hi:
-                seen[from_string(row["perm"])] = None
-    return sorted(seen, key=len)
+    return sorted((from_string(e["perm"]) for e in collect(k)
+                   if lo <= e["n"] <= hi), key=len)
 
 
 def band_profile(els: list[Perm]) -> list[tuple[float, float, int]]:

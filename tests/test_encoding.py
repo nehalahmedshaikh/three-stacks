@@ -18,6 +18,8 @@ import verify
 from unsortable import encoding, perms
 from unsortable.simulator import is_sortable as brute_sortable
 
+SLOW_N7 = pytest.param(7, marks=pytest.mark.slow)
+
 
 @pytest.mark.parametrize("mode", ["full", "reduced"])
 @pytest.mark.parametrize("k", [1, 2, 3])
@@ -28,6 +30,7 @@ def test_exhaustive_agreement_small(mode, k, n):
         assert got.sortable == brute_sortable(p, k=k), (p, k, mode)
 
 
+@pytest.mark.slow
 @pytest.mark.parametrize("mode", ["full", "reduced"])
 @pytest.mark.parametrize("k", [1, 2, 3])
 def test_exhaustive_agreement_n7(mode, k):
@@ -50,7 +53,7 @@ def test_sampled_agreement_larger(k, n):
 
 @pytest.mark.parametrize("mode", ["full", "reduced"])
 @pytest.mark.parametrize("k", [1, 2, 3])
-@pytest.mark.parametrize("n", [1, 2, 3, 4, 5, 6, 7])
+@pytest.mark.parametrize("n", [1, 2, 3, 4, 5, 6, SLOW_N7])
 def test_sat_models_decode_to_real_sorting_runs(mode, k, n):
     """A SAT verdict must come with an operation word that actually sorts."""
     for p in perms.all_perms(n):
@@ -67,6 +70,7 @@ def test_231_one_stack_is_unsat():
     assert encoding.solve((2, 3, 1), k=2).sortable
 
 
+@pytest.mark.slow
 def test_full_and_reduced_agree_on_n7_k2():
     for p in perms.all_perms(7):
         a = encoding.solve(p, k=2, mode="full").sortable
@@ -80,7 +84,7 @@ def test_full_and_reduced_agree_on_n7_k2():
 # 18x faster on a neighbourhood probe, and it must agree exactly.
 
 @pytest.mark.parametrize("k", [1, 2, 3])
-@pytest.mark.parametrize("n", [1, 2, 3, 4, 5, 6, 7])
+@pytest.mark.parametrize("n", [1, 2, 3, 4, 5, 6, SLOW_N7])
 def test_fixed_length_decider_matches_brute_force(k, n):
     from unsortable.encoding import FixedLengthDecider
     with FixedLengthDecider(n, k=k) as d:
@@ -89,7 +93,7 @@ def test_fixed_length_decider_matches_brute_force(k, n):
 
 
 @pytest.mark.parametrize("k", [1, 2, 3])
-@pytest.mark.parametrize("n", [6, 7])
+@pytest.mark.parametrize("n", [6, SLOW_N7])
 def test_fixed_length_decider_matches_one_shot(k, n):
     from unsortable.encoding import FixedLengthDecider
     with FixedLengthDecider(n, k=k) as d:

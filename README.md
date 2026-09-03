@@ -1,27 +1,20 @@
 # three-stacks
 
-> ### This result is superseded
+> ### Current status
 >
-> **Pantone and Vatter (2026) have the bound at [17, 21]**, presented in
+> **Pantone and Vatter (2026) narrowed the answer to [17, 21]**, presented in
 > [this MathFest talk](https://vincevatter.com/talks/2026-mathfest-stacks/).
-> Their shortest witness has length 21:
+> They proved that every permutation of length at most 16 is sortable and
+> gave this unsortable permutation of length 21:
 >
 > ```
 > 6-3-12-8-17-5-2-11-7-19-14-10-4-18-13-21-16-9-20-15-1
 > ```
 >
-> They also proved that **every permutation of length 16 or less is
-> sortable** — so the answer is at least 17, up from Atkinson's 14 — and
-> report 7,354 minimal permutations at length 22 against the one this repo
-> found. Their method (hill climbing and simulated annealing proposing
-> candidates, a SAT formulation deciding them) is the same one derived here
-> independently. Lengths **17, 18, 19 and 20 remain open**.
->
-> This repo's own bound is **22**, reached before that work was known to us.
-> What remains useful: the length-21 witness above is **independently
-> verified here** (unsortable, all 21 one-point deletions sortable with
-> replayed operation words, DRAT checked by drat-trim), and the negative
-> results in [results.md](results.md) document why the search stalls.
+> This repository's independently obtained upper bound 22 is superseded. It
+> now verifies their length-21 witness—including every one-point deletion and
+> a checked DRAT certificate. Lengths **17–20 remain open**. See
+> [results.md](results.md) for provenance, measurements, and limitations.
 
 **A permutation of length 22 that three stacks in series cannot sort — with a
 machine-checkable proof.**
@@ -72,10 +65,9 @@ guessed 22).
 the claim that all three lanes can be drawn with no two bars crossing.*
 Interactive version: [`docs/visualiser.html`](docs/visualiser.html).
 
-## Why it moved now
+## Approach
 
-The bounds predate practical SAT solving, and nothing in the literature had
-applied SAT to multi-stack sortability. Two things made it tractable:
+Three facts make the search tractable:
 
 **1. Sortability is a non-crossing condition.** Give each value `v` four event
 times `t₁[v] < t₂[v] < t₃[v] < t₄[v]`. Then `π` is sortable **iff** those
@@ -112,8 +104,12 @@ random n=40  →  33  →  29  →  28 → 26 → 25 → 24  →  23 → 22
 ## Verify it yourself
 
 ```bash
-python -m venv .venv && .venv/Scripts/pip install python-sat pytest
-python -m pytest                        # 253 tests (3 are slow; -m "not slow" skips them)
+# Ubuntu/Debian: install python3-venv first if ensurepip is unavailable
+python3 -m venv .venv
+source .venv/bin/activate
+python -m pip install -e '.[dev]'
+python -m pytest -n 4                   # full exhaustive suite; expect it to take a while
+python -m pytest -n 4 -m "not slow"     # quicker routine confidence check
 
 # replay a sorting run by hand — no solver involved
 python verify.py replay 231 --k 2 --ops 112123233
@@ -132,8 +128,8 @@ hide.
 
 `proofcheck.py` needs [drat-trim](https://github.com/marijnheule/drat-trim)
 and `scripts/certify.py` needs a CaDiCaL binary. Neither is bundled; the
-tests skip rather than fail without them. Build instructions, including the
-MinGW shim and the two Windows traps that cost hours, are in
+Python tests do not require them. Build instructions, including the Ubuntu
+build and the MinGW traps that cost hours, are in
 [docs/building.md](docs/building.md).
 
 ## Check a candidate of your own
@@ -210,9 +206,9 @@ rule out.
 
 ## Caveats
 
-* **An upper bound.** 22 is a basis element — no deletion of it is
-  unsortable — but it need not be the shortest such permutation anywhere.
-  The truth is in [14, 22].
+* **An upper bound, not the answer.** This repository's length-22 permutation
+  is a basis element, but Pantone and Vatter's later work gives the current
+  interval **[17, 21]**.
 * **Not peer reviewed.** Verified is not refereed.
 * **The certificate proves the CNF is unsatisfiable**, not that the CNF asks
   the right question. See [results.md § Verification](results.md#verification).

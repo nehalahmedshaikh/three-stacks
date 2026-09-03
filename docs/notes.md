@@ -27,7 +27,7 @@ positions. Hence
 and the set of sortable permutations of length `n` is exactly the image of
 the (finite) set of ballot words under `w |-> phi_w^{-1}`. This is what makes
 positive claims cheap to check: hand over `w`, replay, done. It is also the
-source of the counting bound in §4.
+source of the counting bound in §5.
 
 ## 2. The two prunings in `simulator.py`
 
@@ -119,8 +119,8 @@ that run:
 (b) `t_3[1]=6 < t_3[2]=8 < t_3[3]=9`. ✓
 (c) `S1` intervals `2:[1,7]`, `3:[2,3]`, `1:[4,5]` — the last two are nested
 inside the first and disjoint from each other. `S2` intervals `3:[3,9]`,
-`1:[5,6]`, `2:[7,8]` — likewise. No crossings. ✓ The extra stack buys the room to nest what one stack had to
-cross.
+`1:[5,6]`, `2:[7,8]` — likewise. No crossings. ✓ The extra stack buys the
+room to nest what one stack had to cross.
 
 ## 4. Downward closure
 
@@ -146,8 +146,8 @@ order. They are all legal:
 
 `minimise` is sound because of this: it need only check that the shrunken
 permutation is still unsortable. `tests/test_closure.py` checks the claim
-exhaustively for `k = 1, 2` at `n <= 8`, where unsortable permutations exist
-and the statement has teeth, and on sampled long permutations for `k = 3`.
+exhaustively for `k = 1, 2, 3` at `n <= 7`, where the `k = 1, 2` cases include
+unsortable permutations, and against a known long `k = 3` witness.
 
 **Symmetries.** None of reverse, complement, inverse, or reverse-complement
 preserves sortability on its own. For `k = 1`: `231` is unsortable while its
@@ -187,8 +187,8 @@ the reversed machine `M^r` sorts `(pi^rc)^-1`. For k stacks in series the
 reversed machine is the same machine, so the map is a symmetry of the class.
 It was re-derived here before being found in the literature; the derivation
 below is included because it is short inside the interval encoding of §3, and
-because §4 wrongly recorded that no symmetry was available — that claim was
-tested only on the four maps individually, never on their composition.
+because an earlier version of §4 wrongly recorded that no symmetry was
+available—the four maps were tested individually, but not their composition.
 
 **Proof.** Take a sorting run for `pi` and let `t_1[v] < ... < t_{k+1}[v]` be
 the event times of §3. Reverse time: put `u_s[v] = -t_{k+2-s}[v]`.
